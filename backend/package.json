@@ -1,0 +1,29 @@
+{
+  "name": "e-commerce-backend",
+  "version": "2.0.0",
+  "description": "Full Stack E-Commerce Backend API with Cloudinary Integration",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "OWAIS MANZOOR",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cloudinary": "^1.41.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^7.5.0",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "stripe": "^20.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
