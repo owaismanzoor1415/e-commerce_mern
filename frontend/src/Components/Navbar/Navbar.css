@@ -130,6 +130,10 @@
 
 /* ----------  mobile ---------- */
 @media (max-width: 800px) {
+  .nav {
+    padding: 0.8rem 5vw; /* responsive padding */
+  }
+
   .nav-menu {
     position: absolute;
     top: 100%;
@@ -146,14 +150,43 @@
     opacity: 0;
     transition: transform 0.4s ease, opacity 0.4s ease;
   }
+
   .nav-menu-visible {
     transform: translateY(0);
     opacity: 1;
   }
+
   .nav-dropdown {
     display: block;
   }
+
   .underline {
     display: none; /* hide slide underline on mobile */
+  }
+
+  .nav-login-cart button {
+    padding: 0.5rem 1.4rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* ---------- extra small screens ---------- */
+@media (max-width: 500px) {
+  .nav-logo p {
+    font-size: 1.2rem;
+  }
+
+  .nav-logo img {
+    height: 1.8rem;
+  }
+
+  .cart-link img {
+    height: 1.4rem;
+  }
+
+  .nav-cart-count {
+    width: 1.1rem;
+    height: 1.1rem;
+    font-size: 0.7rem;
   }
 }

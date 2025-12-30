@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
+import { FaLinkedin, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import './Footer.css';
 import { useNotification } from '../../Context/NotificationContext';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const { success } = useNotification();
   const [ripple, setRipple] = useState(null);
 
   const socials = [
-    { id: 'linkedin', icon: '🔗', url: 'https://www.linkedin.com/in/owais-manzoor-989314261/' },
-    { id: 'github', icon: '💻', url: 'https://github.com/owaismanzoor1415' },
-    { id: 'whatsapp', icon: '💬', url: 'https://wa.me/919999999999' },
+    { id: 'linkedin', icon: <FaLinkedin />, url: 'https://linkedin.com' },
+    { id: 'instagram', icon: <FaInstagram />, url: 'https://instagram.com' },
+    { id: 'whatsapp', icon: <FaWhatsapp />, url: 'https://wa.me/91xxxxxxxxxx' },
   ];
 
+  /* ✅ QUICK LINKS – WORKING ROUTES */
   const quickLinks = [
     { label: 'Shop', path: '/' },
-    { label: 'Track Order', path: '/track' },
-    { label: 'Support', path: '/support' },
-    { label: 'Returns', path: '/returns' },
+    { label: 'Men', path: '/mens' },
+    { label: 'Women', path: '/womens' },
+    { label: 'Kids', path: '/kids' },
   ];
 
   const handleSocial = (url, id) => {
@@ -51,7 +54,7 @@ const Footer = () => {
           <ul>
             {quickLinks.map((l) => (
               <li key={l.label}>
-                <a href={l.path}>{l.label}</a>
+                <Link to={l.path}>{l.label}</Link>
               </li>
             ))}
           </ul>
@@ -76,7 +79,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Copyright – fade + glow pulse */}
+      {/* Copyright */}
       <motion.div
         className="footer-copyright"
         initial={{ opacity: 0 }}
@@ -85,6 +88,7 @@ const Footer = () => {
       >
         <hr />
         <p className="owais-line">Developed by OWAIS</p>
+        <p>9103236571</p>
       </motion.div>
     </footer>
   );

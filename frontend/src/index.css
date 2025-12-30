@@ -24,3 +24,41 @@ a {
 .animate-slide-in {
   animation: slideIn 0.3s ease-out forwards;
 }
+
+/* ================= RESPONSIVE / GLOBAL ADDITIONS ONLY ================= */
+
+/* make images responsive everywhere */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* responsive base font sizing */
+body {
+  font-size: clamp(14px, 2vw, 16px);
+  line-height: 1.5;
+}
+
+/* prevent horizontal overflow on mobile */
+body,
+html {
+  overflow-x: hidden;
+}
+
+/* mobile touch-friendly buttons */
+button {
+  touch-action: manipulation;
+}
+
+/* small screens */
+@media (max-width: 600px) {
+  body {
+    font-size: 14px;
+  }
+}

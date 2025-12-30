@@ -7,6 +7,7 @@ import Cart from "./Pages/Cart";
 import Product from "./Pages/Product";
 import Footer from "./Components/Footer/Footer";
 import ShopCategory from "./Pages/ShopCategory";
+import DescriptionBox from "./Components/DescriptionBox/DescriptionBox";
 import Checkout from "./Pages/Checkout";
 import women_banner from "./Components/Assets/banner_women.png";
 import men_banner from "./Components/Assets/banner_mens.png";
@@ -78,6 +79,7 @@ function App() {
           <Route path="/verify" element={<AnimatedPage><Verify /></AnimatedPage>} />
           <Route path="/cart" element={<AnimatedPage><Cart /></AnimatedPage>} />
           <Route path="/login" element={<AnimatedPage><LoginSignup /></AnimatedPage>} />
+          <Route path="/description" element={<DescriptionBox />} />
         </Routes>
       </AnimatePresence>
       <Footer />

@@ -3,45 +3,46 @@ import './NewsLetter.css';
 import { useNotification } from '../../Context/NotificationContext';
 
 const NewsLetter = () => {
-  const { warning, success, error } = useNotification();
+  const { warning, success } = useNotification();
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
-  const handleSubscribe = async () => {
+  // simple & safe email validation
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleSubscribe = () => {
     if (!email) {
       warning('Please enter your email');
       return;
     }
-    setLoading(true);
-    try {
-      const res = await fetch('http://localhost:3000/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      success(data.message || 'Subscribed!');
-      setSubmitted(true);
-      setEmail('');
-      setTimeout(() => setSubmitted(false), 4000);
-    } catch {
-      error('Something went wrong.');
+
+    if (!isValidEmail(email)) {
+      warning('Please enter a valid email address');
+      return;
     }
-    setLoading(false);
+
+    // Open user's email app ONLY if email is valid
+    window.location.href =
+      `mailto:${email}?subject=SwiftCart Newsletter&body=I want to subscribe to SwiftCart updates.`;
+
+    success('Opening email app...');
+    setEmail('');
   };
 
   return (
     <div className="news-wheel-wrapper">
-      <div className={`news-wheel ${submitted ? 'done' : ''}`}>
+      <div className="news-wheel">
         <div className="wheel-spokes">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="spoke" style={{ '--i': i }} />
           ))}
         </div>
+
         <div className="wheel-center">
           <h2>Join the Orbit</h2>
           <p>Lock in exclusive deals</p>
+
           <input
             type="email"
             placeholder="your@email.com"
@@ -49,18 +50,12 @@ const NewsLetter = () => {
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
           />
-          <button onClick={handleSubscribe} disabled={loading}>
-            {loading ? 'Locking...' : 'Lock In'}
+
+          <button onClick={handleSubscribe}>
+            Lock In
           </button>
         </div>
       </div>
-
-      {submitted && (
-        <div className="comet">
-          <div className="comet-tail" />
-          <div className="comet-head" />
-        </div>
-      )}
     </div>
   );
 };

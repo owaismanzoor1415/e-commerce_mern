@@ -8,9 +8,9 @@ const Hero = () => {
 
   const cards = [
     { id: 1, label: 'Hoodies', color: '#ff4141' },
-    { id: 2, label: 'Sneakers', color: '#4141ff' },
+    { id: 2, label: 'Sweaters', color: '#4141ff' },
     { id: 3, label: 'Jackets', color: '#41ff41' },
-    { id: 4, label: 'Caps', color: '#ff41ff' },
+    { id: 4, label: 'Tops', color: '#ff41ff' },
   ];
 
   const handleShopNow = () => {

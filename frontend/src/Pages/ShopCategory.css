@@ -128,17 +128,6 @@
   left: 100%;
 }
 
-/* mobile */
-@media (max-width: 600px) {
-  .shopcategory-products {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
-  }
-  .shopcategory-header h1 {
-    font-size: 1.6rem;
-  }
-}
-
 /* ----  NEW: interactive text banner (no image)  ---- */
 .hero-banner {
   height: 220px;
@@ -166,3 +155,53 @@
   opacity: 0.9;
 }
 
+/* ================= RESPONSIVE ADDITIONS ONLY ================= */
+
+/* tablets */
+@media (max-width: 900px) {
+  .shopcategory-max {
+    padding: 2rem 5vw;
+  }
+
+  .shopcategory-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+}
+
+/* mobile */
+@media (max-width: 600px) {
+  .shopcategory-max {
+    padding: 1.5rem 4vw;
+  }
+
+  .shopcategory-products {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  .shopcategory-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .shopcategory-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .hero-banner {
+    height: 180px;
+  }
+
+  .hero-text h1 {
+    font-size: 1.6rem;
+  }
+
+  .hero-text p {
+    font-size: 0.9rem;
+  }
+}
