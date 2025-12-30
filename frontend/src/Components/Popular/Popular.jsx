@@ -1,19 +1,54 @@
-import React from 'react'
-import './Popular.css'
-import Item from '../Item/Item'
+import React from 'react';
+import './Popular.css';
+import Item from '../Item/Item';
+import { motion } from 'framer-motion';
 
 const Popular = (props) => {
-  return (
-    <div className='popular'>
-      <h1>POPULAR IN WOMEN</h1>
-      <hr />
-      <div className="popular-item">
-        {props.data.map((item,index)=>{
-            return <Item id={item.id} key={index} name={item.name} image={item.image}  new_price={item.new_price} old_price={item.old_price}/>
-        })}
-      </div>
-    </div>
-  )
-}
+  const hasData = props.data && props.data.length;
 
-export default Popular
+  return (
+    <div className="popular">
+      <motion.h1
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        POPULAR IN WOMEN
+      </motion.h1>
+      <hr />
+
+      {hasData ? (
+        <div className="popular-item horizontal-row">
+          {props.data.map((item) => (
+            <motion.div
+              key={item.id}
+              className="card-wrapper"
+              whileTap={{ scale: 0.97 }}
+            >
+              <Item
+                id={item.id}
+                name={item.name}
+                image={item.image}
+                new_price={item.new_price}
+                old_price={item.old_price}
+              />
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <SkeletonRow />
+      )}
+    </div>
+  );
+};
+
+/* skeleton until data loads */
+const SkeletonRow = () => (
+  <div className="popular-item horizontal-row skeleton-row">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div className="skeleton-card" key={i} />
+    ))}
+  </div>
+);
+
+export default Popular;

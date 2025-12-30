@@ -1,29 +1,46 @@
-import React from "react";
-import "./Hero.css";
-import hero_image from "../Assets/hero_image.png";
-import hand_icon from "../Assets/hand_icon.png";
-import arrow_icon from "../Assets/arrow.png";
+import React, { useState } from 'react';
+import './Hero.css';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const [ripple, setRipple] = useState(false);
+
+  const cards = [
+    { id: 1, label: 'Hoodies', color: '#ff4141' },
+    { id: 2, label: 'Sneakers', color: '#4141ff' },
+    { id: 3, label: 'Jackets', color: '#41ff41' },
+    { id: 4, label: 'Caps', color: '#ff41ff' },
+  ];
+
+  const handleShopNow = () => {
+    setRipple(true);
+    setTimeout(() => setRipple(false), 600);
+    navigate('/mens'); // or any route
+  };
+
   return (
-    <div className="hero">
-      <div className="hero-left">
-        <h2>NEW ARRIVALS ONLY</h2>
-        <div>
-          <div className="hero-hand-icon">
-            <p>latest</p>
-            <img src={hand_icon} alt="" />
-          </div>
-          <p>trends</p>
-          <p>for everyone</p>
-        </div>
-        <div className="hero-latest-btn">
-          <div>Latest Collection</div>
-          <img src={arrow_icon} alt="" />
-        </div>
+    <div className="hero-new">
+      <div className="hero-left-new">
+        <h1 className="glitch" data-text="DRESS DIFFERENT">
+          DRESS DIFFERENT
+        </h1>
+        <p className="sub">Street-ready drops. Zero compromises.</p>
+        <button className={`shop-now ${ripple ? 'ripple' : ''}`} onClick={handleShopNow}>
+          <span>Shop The Drop</span>
+        </button>
       </div>
-      <div className="hero-right">
-        <img src={hero_image} alt="hero" />
+
+      <div className="hero-right-new">
+        {cards.map((c, i) => (
+          <div
+            key={c.id}
+            className="float-card"
+            style={{ '--delay': i * 0.2, '--color': c.color }}
+          >
+            {c.label}
+          </div>
+        ))}
       </div>
     </div>
   );

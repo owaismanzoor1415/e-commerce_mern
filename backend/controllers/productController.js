@@ -5,7 +5,7 @@ const Product = require("../models/Product");
 // @access  Public
 exports.getAllProducts = async (req, res, next) => {
     try {
-        const products = await Product.find({}).sort({ createdAt: -1 });
+        const products = await Product.find({}).sort({ createdAt: -1 }).limit(100);
         res.json({
             success: true,
             count: products.length,
@@ -16,12 +16,12 @@ exports.getAllProducts = async (req, res, next) => {
     }
 };
 
-// @desc    Get new collections (last 8 products)
+// @desc    Get new collections (last 30 products)
 // @route   GET /api/products/newcollections
 // @access  Public
 exports.getNewCollections = async (req, res, next) => {
     try {
-        const products = await Product.find({}).sort({ createdAt: -1 }).limit(8);
+        const products = await Product.find({}).sort({ createdAt: -1 }).limit(30);
         res.json({
             success: true,
             count: products.length,
@@ -37,7 +37,7 @@ exports.getNewCollections = async (req, res, next) => {
 // @access  Public
 exports.getPopularInWomen = async (req, res, next) => {
     try {
-        const products = await Product.find({ category: "women" }).limit(4);
+        const products = await Product.find({ category: "women" }).limit(10);
         res.json({
             success: true,
             count: products.length,
@@ -62,7 +62,7 @@ exports.getRelatedProducts = async (req, res, next) => {
             });
         }
 
-        const products = await Product.find({ category }).limit(4);
+        const products = await Product.find({ category }).limit(10);
         res.json({
             success: true,
             count: products.length,
@@ -75,12 +75,14 @@ exports.getRelatedProducts = async (req, res, next) => {
 
 // @desc    Add new product
 // @route   POST /api/products
-// @access  Admin (should add admin middleware later)
+// @access  Admin
 exports.addProduct = async (req, res, next) => {
     try {
         const { name, description, image, category, new_price, old_price } = req.body;
 
-        // Get the last product to generate new ID
+        /* ----  DEBUG: log full body  ---- */
+        console.log('>>> addProduct body:', req.body);
+
         const products = await Product.find({}).sort({ id: -1 }).limit(1);
         const id = products.length > 0 ? products[0].id + 1 : 1;
 
@@ -102,6 +104,7 @@ exports.addProduct = async (req, res, next) => {
             product,
         });
     } catch (error) {
+        console.error('>>> addProduct error:', error.message);
         next(error);
     }
 };

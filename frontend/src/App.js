@@ -1,5 +1,7 @@
 import Navbar from "./Components/Navbar/Navbar";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Shop from "./Pages/Shop";
 import Cart from "./Pages/Cart";
 import Product from "./Pages/Product";
@@ -15,24 +17,104 @@ import Verify from "./Pages/Verify";
 export const backend_url = process.env.REACT_APP_BACKEND_URL;
 export const currency = '₹';
 
-function App() {
+/* ----------  Animated Page Wrapper  ---------- */
+const AnimatedPage = ({ children }) => (
+  <motion.div
+    key={window.location.pathname}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.35, ease: "easeInOut" }}
+  >
+    {children}
+  </motion.div>
+);
+
+/* ----------  Scroll-To-Top Helper  ---------- */
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => window.scrollTo(0, 0), [pathname]);
+  return null;
+};
+
+/* ----------  Loading Bar  ---------- */
+const PageLoader = () => {
+  const [loading, setLoading] = useState(false);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    setLoading(true);
+    const id = setTimeout(() => setLoading(false), 400);
+    return () => clearTimeout(id);
+  }, [pathname]);
+
   return (
-    <Router>
+    <motion.div
+      className="global-loader"
+      initial={{ scaleX: 0 }}
+      animate={{ scaleX: loading ? 1 : 0 }}
+      style={{ originX: 0 }}
+      transition={{ duration: 0.4 }}
+    />
+  );
+};
+
+/* ----------  Main App  ---------- */
+function App() {
+  const location = useLocation();
+  return (
+    <>
+      <PageLoader />
+      <ScrollToTop />
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Shop gender="all" />} />
-        <Route path="/mens" element={<ShopCategory banner={men_banner} category="men" />} />
-        <Route path="/womens" element={<ShopCategory banner={women_banner} category="women" />} />
-        <Route path="/kids" element={<ShopCategory banner={kid_banner} category="kid" />} />
-        <Route path="/product/:productId" element={<Product />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/verify" element={<Verify />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/login" element={<LoginSignup />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<AnimatedPage><Shop gender="all" /></AnimatedPage>} />
+          <Route path="/mens" element={<AnimatedPage><ShopCategory banner={men_banner} category="men" /></AnimatedPage>} />
+          <Route path="/womens" element={<AnimatedPage><ShopCategory banner={women_banner} category="women" /></AnimatedPage>} />
+          <Route path="/kids" element={<AnimatedPage><ShopCategory banner={kid_banner} category="kids" /></AnimatedPage>} />
+          <Route path="/product/:productId" element={<AnimatedPage><Product /></AnimatedPage>} />
+          <Route path="/checkout" element={<AnimatedPage><Checkout /></AnimatedPage>} />
+          <Route path="/verify" element={<AnimatedPage><Verify /></AnimatedPage>} />
+          <Route path="/cart" element={<AnimatedPage><Cart /></AnimatedPage>} />
+          <Route path="/login" element={<AnimatedPage><LoginSignup /></AnimatedPage>} />
+        </Routes>
+      </AnimatePresence>
       <Footer />
-    </Router>
+      <style jsx global>{`
+        /* ---- mini design-tokens ---- */
+        :root {
+          --accent: #ff4141;
+          --bg: #fefefe;
+          --text: #222;
+          --radius: 12px;
+          --shadow: 0 8px 20px -6px rgba(0,0,0,.15);
+          --font: "Inter", system-ui, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: var(--font);
+          background: var(--bg);
+          color: var(--text);
+          scroll-behavior: smooth;
+        }
+        .global-loader {
+          position: fixed;
+          top: 0; left: 0; right: 0; height: 3px;
+          background: var(--accent);
+          transform-origin: left;
+          z-index: 9999;
+        }
+      `}</style>
+    </>
   );
 }
 
-export default App;
+/* ----------  Router Wrapper  ---------- */
+export default function Root() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}

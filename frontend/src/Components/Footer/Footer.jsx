@@ -1,60 +1,93 @@
-import React from 'react'
-import './Footer.css'
-
-import footer_logo from '../Assets/nav-logo.png'
-import linkedin_icon from '../Assets/linkedin_icon.png'
-import github_icon from '../Assets/github_icon.png'
-import whatsapp_icon from '../Assets/whatsapp_icon.png'
+import React, { useState } from 'react';
+import './Footer.css';
+import { useNotification } from '../../Context/NotificationContext';
+import { motion } from 'framer-motion';
 
 const Footer = () => {
+  const { success } = useNotification();
+  const [ripple, setRipple] = useState(null);
+
+  const socials = [
+    { id: 'linkedin', icon: '🔗', url: 'https://www.linkedin.com/in/owais-manzoor-989314261/' },
+    { id: 'github', icon: '💻', url: 'https://github.com/owaismanzoor1415' },
+    { id: 'whatsapp', icon: '💬', url: 'https://wa.me/919999999999' },
+  ];
+
+  const quickLinks = [
+    { label: 'Shop', path: '/' },
+    { label: 'Track Order', path: '/track' },
+    { label: 'Support', path: '/support' },
+    { label: 'Returns', path: '/returns' },
+  ];
+
+  const handleSocial = (url, id) => {
+    setRipple(id);
+    setTimeout(() => setRipple(null), 600);
+    window.open(url, '_blank', 'noopener');
+    success('Opening link...');
+  };
+
   return (
-    <div className='footer'>
-      <div className="footer-logo">
-        <img src={footer_logo} alt="" />
-        <p>SwiftCart</p>
+    <footer className="footer-new">
+      <div className="footer-glow" />
+
+      <div className="footer-content">
+        {/* Brand */}
+        <motion.div
+          className="footer-brand"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        >
+          <div className="logo-circle">SC</div>
+          <div>
+            <h3>SwiftCart</h3>
+            <p>Fast fashion, faster delivery.</p>
+          </div>
+        </motion.div>
+
+        {/* Quick Links */}
+        <div className="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            {quickLinks.map((l) => (
+              <li key={l.label}>
+                <a href={l.path}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Social */}
+        <div className="footer-social">
+          <h4>Follow</h4>
+          <div className="social-icons">
+            {socials.map((s) => (
+              <motion.div
+                key={s.id}
+                className={`social-icon ${ripple === s.id ? 'ripple' : ''}`}
+                onClick={() => handleSocial(s.url, s.id)}
+                whileHover={{ scale: 1.2, rotate: -10 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <span>{s.icon}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
-      {/* <ul className="footer-links">
-        <li>Company</li>
-        <li>Products</li>
-        <li>Offices</li>
-        <li>About</li>
-        <li>Contact</li>
-      </ul> */}
-      <div className="footer-social-icons">
-  <a
-    href="https://www.linkedin.com/in/owais-manzoor-989314261/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="footer-icons-container"
-  >
-    <img src={linkedin_icon} alt="LinkedIn" />
-  </a>
 
-  <a
-    href="https://github.com/owaismanzoor1415"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="footer-icons-container"
-  >
-    <img src={github_icon} alt="GitHub" />
-  </a>
-
-  <a
-    href="https://wa.me/919999999999"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="footer-icons-container"
-  >
-    <img src={whatsapp_icon} alt="WhatsApp" />
-  </a>
-</div>
-
-      <div className="footer-copyright">
+      {/* Copyright – fade + glow pulse */}
+      <motion.div
+        className="footer-copyright"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
         <hr />
-        <p>Developed by OWAIS</p>
-      </div>
-    </div>
-  )
-}
+        <p className="owais-line">Developed by OWAIS</p>
+      </motion.div>
+    </footer>
+  );
+};
 
-export default Footer
+export default Footer;

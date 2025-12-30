@@ -12,7 +12,7 @@ const AddProduct = () => {
     name: "",
     description: "",
     image: "",
-    category: "women",
+    category: "men",
     new_price: "",
     old_price: ""
   });
@@ -44,7 +44,8 @@ const AddProduct = () => {
           Accept: 'application/json',
         },
         body: formData,
-      }).then((resp) => resp.json())
+      })
+        .then((resp) => resp.json())
         .then((data) => { dataObj = data });
 
       if (dataObj.success) {
@@ -61,12 +62,11 @@ const AddProduct = () => {
           .then((data) => {
             if (data.success) {
               toast.success("✓ Product added successfully!");
-              // Reset form
               setProductDetails({
                 name: "",
                 description: "",
                 image: "",
-                category: "women",
+                category: "men",
                 new_price: "",
                 old_price: ""
               });
@@ -84,48 +84,95 @@ const AddProduct = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const changeHandler = (e) => {
     setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
-  }
+  };
 
   return (
     <div className="addproduct">
       <div className="addproduct-itemfield">
         <p>Product title</p>
-        <input type="text" name="name" value={productDetails.name} onChange={(e) => { changeHandler(e) }} placeholder="Type here" />
+        <input
+          type="text"
+          name="name"
+          value={productDetails.name}
+          onChange={changeHandler}
+          placeholder="Type here"
+        />
       </div>
+
       <div className="addproduct-itemfield">
         <p>Product description</p>
-        <input type="text" name="description" value={productDetails.description} onChange={(e) => { changeHandler(e) }} placeholder="Type here" />
+        <input
+          type="text"
+          name="description"
+          value={productDetails.description}
+          onChange={changeHandler}
+          placeholder="Type here"
+        />
       </div>
+
       <div className="addproduct-price">
         <div className="addproduct-itemfield">
           <p>Price</p>
-          <input type="number" name="old_price" value={productDetails.old_price} onChange={(e) => { changeHandler(e) }} placeholder="Type here" />
+          <input
+            type="number"
+            name="old_price"
+            value={productDetails.old_price}
+            onChange={changeHandler}
+            placeholder="Type here"
+          />
         </div>
         <div className="addproduct-itemfield">
           <p>Offer Price</p>
-          <input type="number" name="new_price" value={productDetails.new_price} onChange={(e) => { changeHandler(e) }} placeholder="Type here" />
+          <input
+            type="number"
+            name="new_price"
+            value={productDetails.new_price}
+            onChange={changeHandler}
+            placeholder="Type here"
+          />
         </div>
       </div>
+
       <div className="addproduct-itemfield">
         <p>Product category</p>
-        <select value={productDetails.category} name="category" className="add-product-selector" onChange={changeHandler}>
+        <select
+          value={productDetails.category}
+          name="category"
+          className="add-product-selector"
+          onChange={changeHandler}
+        >
           <option value="women">Women</option>
           <option value="men">Men</option>
-          <option value="kid">Kid</option>
+          <option value="kids">Kids</option> {/* ✅ FIXED */}
         </select>
       </div>
+
       <div className="addproduct-itemfield">
         <p>Product image</p>
         <label htmlFor="file-input">
-          <img className="addproduct-thumbnail-img" src={!image ? upload_area : URL.createObjectURL(image)} alt="" />
+          <img
+            className="addproduct-thumbnail-img"
+            src={!image ? upload_area : URL.createObjectURL(image)}
+            alt=""
+          />
         </label>
-        <input onChange={(e) => setImage(e.target.files[0])} type="file" name="image" id="file-input" accept="image/*" hidden />
+        <input
+          onChange={(e) => setImage(e.target.files[0])}
+          type="file"
+          name="image"
+          id="file-input"
+          accept="image/*"
+          hidden
+        />
       </div>
-      <button className="addproduct-btn" onClick={() => { AddProduct() }}>ADD</button>
+
+      <button className="addproduct-btn" onClick={AddProduct}>
+        ADD
+      </button>
     </div>
   );
 };

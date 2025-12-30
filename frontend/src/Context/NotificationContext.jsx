@@ -1,111 +1,199 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
 const NotificationContext = createContext();
 
 export const useNotification = () => {
-    const context = useContext(NotificationContext);
-    if (!context) {
-        throw new Error('useNotification must be used within NotificationProvider');
-    }
-    return context;
+  const ctx = useContext(NotificationContext);
+  if (!ctx) throw new Error('useNotification must be used within NotificationProvider');
+  return ctx;
 };
 
+/* ----------  provider  ---------- */
 export const NotificationProvider = ({ children }) => {
-    const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
-    // Add a new notification
-    const notify = useCallback((message, type = 'info', duration = 3000) => {
-        const id = Date.now();
-        setNotifications(prev => [...prev, { id, message, type }]);
+  const remove = useCallback((id) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  }, []);
 
-        if (duration) {
-            setTimeout(() => {
-                removeNotification(id);
-            }, duration);
-        }
-    }, []);
+  const notify = useCallback(
+    (message, type = 'info', duration = 4000) => {
+      const id = Date.now() + Math.random();
+      setNotifications((prev) => [...prev, { id, message, type, duration }]);
+    },
+    []
+  );
 
-    const removeNotification = useCallback((id) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
-    }, []);
+  const success = (m) => notify(m, 'success');
+  const error = (m) => notify(m, 'error');
+  const warning = (m) => notify(m, 'warning');
+  const info = (m) => notify(m, 'info');
 
-    // Helper functions
-    const success = (msg) => notify(msg, 'success');
-    const error = (msg) => notify(msg, 'error');
-    const warning = (msg) => notify(msg, 'warning');
-    const info = (msg) => notify(msg, 'info');
-
-    return (
-        <NotificationContext.Provider value={{ notify, success, error, warning, info }}>
-            {children}
-
-            {/* Notification Container */}
-            <div style={{
-                position: 'fixed',
-                top: '80px',
-                right: '20px',
-                zIndex: 9999,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-                pointerEvents: 'none'
-            }}>
-                {notifications.map(n => (
-                    <div
-                        key={n.id}
-                        className="animate-slide-in"
-                        style={{
-                            pointerEvents: 'auto',
-                            minWidth: '300px',
-                            maxWidth: '350px',
-                            padding: '16px',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                            color: 'white',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            background: getBackground(n.type),
-                            fontFamily: "'Poppins', sans-serif"
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontSize: '20px' }}>
-                                {n.type === 'success' && '✅'}
-                                {n.type === 'error' && '❌'}
-                                {n.type === 'warning' && '⚠️'}
-                                {n.type === 'info' && 'ℹ️'}
-                            </span>
-                            <p style={{ margin: 0, fontSize: '14px', fontWeight: '500' }}>{n.message}</p>
-                        </div>
-
-                        <button
-                            onClick={() => removeNotification(n.id)}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'white',
-                                cursor: 'pointer',
-                                fontSize: '16px',
-                                opacity: 0.8,
-                                marginLeft: '10px'
-                            }}
-                        >
-                            ✕
-                        </button>
-                    </div>
-                ))}
-            </div>
-        </NotificationContext.Provider>
-    );
+  return (
+    <NotificationContext.Provider value={{ notify, success, error, warning, info }}>
+      {children}
+      <Portal>
+        <div style={portalStyles}>
+          {notifications.map((n) => (
+            <NotifCard key={n.id} {...n} onRemove={() => remove(n.id)} />
+          ))}
+        </div>
+      </Portal>
+    </NotificationContext.Provider>
+  );
 };
 
-const getBackground = (type) => {
-    switch (type) {
-        case 'success': return 'linear-gradient(135deg, #10b981 0%, #059669 100%)'; // Green
-        case 'error': return 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';   // Red
-        case 'warning': return 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'; // Orange
-        case 'info': return 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';    // Blue
-        default: return '#333';
-    }
+/* ----------  single 3-D card  ---------- */
+const NotifCard = ({ id, message, type, duration, onRemove }) => {
+  const [exit, setExit] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setExit(true);
+      setTimeout(onRemove, 300);
+    }, duration);
+    return () => clearTimeout(t);
+  }, [duration, onRemove]);
+
+  const emoji = type === 'success' ? '🎉' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+  const title = type.charAt(0).toUpperCase() + type.slice(1);
+
+  return (
+    <div
+      style={{
+        ...cardStyles,
+        ...(exit ? exitStyles : {}),
+        '--accent': type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6',
+      }}
+    >
+      <div style={frontStyles}>
+        <div style={emojiStyles}>{emoji}</div>
+        <div style={textStyles}>
+          <div style={titleStyles}>{title}</div>
+          <div style={msgStyles}>{message}</div>
+        </div>
+        <button style={closeStyles} onClick={() => setExit(true)}>✕</button>
+      </div>
+
+      {/* progress bar */}
+      <div style={progressStyles}>
+        <div
+          style={{
+            ...barStyles,
+            background: type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6',
+            animation: `shrink ${duration}ms linear forwards`,
+          }}
+        />
+      </div>
+
+      <style>{`
+        @keyframes shrink {
+          to { transform: scaleX(0); }
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(-60px) rotateX(-25deg); }
+          to { opacity: 1; transform: translateY(0) rotateX(0); }
+        }
+        @keyframes slideOut {
+          to { opacity: 0; transform: translateX(120px) rotateY(45deg); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+/* ----------  portal  ---------- */
+const Portal = ({ children }) => {
+  const [el, setEl] = useState(null);
+  useEffect(() => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+    setEl(div);
+    return () => document.body.removeChild(div);
+  }, []);
+  return el ? ReactDOM.createPortal(children, el) : null;
+};
+
+/* ----------  styles  ---------- */
+const portalStyles = {
+  position: 'fixed',
+  top: '20px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  zIndex: 9999,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+  pointerEvents: 'none',
+};
+
+const cardStyles = {
+  position: 'relative',
+  width: '340px',
+  padding: '16px',
+  borderRadius: '16px',
+  background: 'rgba(255,255,255,0.95)',
+  backdropFilter: 'blur(10px)',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+  pointerEvents: 'auto',
+  animation: 'slideIn 0.4s ease-out',
+  transformStyle: 'preserve-3d',
+  color: '#333',
+  fontFamily: `'Poppins', sans-serif`,
+};
+
+const exitStyles = {
+  animation: 'slideOut 0.3s ease-in forwards',
+};
+
+const frontStyles = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+};
+
+const emojiStyles = {
+  fontSize: '28px',
+};
+
+const textStyles = {
+  flex: 1,
+};
+
+const titleStyles = {
+  fontWeight: 600,
+  fontSize: '15px',
+  marginBottom: '2px',
+  color: 'var(--accent)',
+};
+
+const msgStyles = {
+  fontSize: '14px',
+  opacity: 0.9,
+};
+
+const closeStyles = {
+  background: 'none',
+  border: 'none',
+  fontSize: '18px',
+  opacity: 0.6,
+  cursor: 'pointer',
+  transition: 'opacity 0.2s',
+};
+
+const progressStyles = {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: '3px',
+  background: 'rgba(0,0,0,0.1)',
+  borderRadius: '0 0 16px 16px',
+  overflow: 'hidden',
+};
+
+const barStyles = {
+  height: '100%',
+  transformOrigin: 'left',
 };

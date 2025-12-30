@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { useNotification } from "../Context/NotificationContext";
 import { ShopContext } from "../Context/ShopContext";
 import { backend_url } from "../App";
-import './CSS/Checkout.css';
+import './Checkout.css';
 
 const Checkout = () => {
   const { cartItems, getTotalCartAmount, products } = useContext(ShopContext);

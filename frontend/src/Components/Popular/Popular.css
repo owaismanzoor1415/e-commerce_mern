@@ -1,39 +1,66 @@
-.popular{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    max-width: 1280px;
-    margin: auto;
+.popular {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 5.5rem 0; /* removed side padding so row bleeds */
+  background: #fff;
 }
-.popular h1{
-    color: #171717;
-    font-size: 40px;
-    font-weight: 600;
-}
-.popular hr{
-    width: 150px;
-    height: 4px;
-    border-radius: 10px;
-    background: #252525;
-}
-.popular-item{
-    margin-top: 40px;
-    display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 25px;
-    justify-content: center;
-}
-/* ---------- media query------------ */
 
-@media(max-width: 800px){
-    .popular h1{
-        font-size: 30px;
-    }
-    .popular hr{
-        width: 80px;
-        height: 4px;
-        
-    }
+.popular h1 {
+  color: #171717;
+  font-size: 3.1rem;
+  font-weight: 600;
+}
+
+.popular hr {
+  width: 12.5rem; /* 200px */
+  height: 0.25rem; /* 4px */
+  border-radius: 0.6rem;
+  background: #252525;
+}
+
+/* ----------  horizontal row ---------- */
+.horizontal-row {
+  display: flex;
+  gap: 1.8rem;
+  margin-top: 3.1rem; /* 50px */
+  padding: 0 10vw; /* keeps first card away from edge */
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; /* smooth iOS scroll */
+}
+
+.horizontal-row::-webkit-scrollbar {
+  height: 8px;
+}
+.horizontal-row::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.card-wrapper {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-wrapper:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* skeleton row */
+.skeleton-row .skeleton-card {
+  flex: 0 0 220px; /* same width as real card */
+  height: 280px;
+  background: #e2e2e2;
+  border-radius: 12px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.5; }
+  100% { opacity: 1; }
 }
