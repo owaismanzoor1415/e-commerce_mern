@@ -1,9 +1,10 @@
 .new-collections-new {
-  padding: 4rem 10vw;
+  padding: 4rem 5vw; /* reduced from 10vw */
   background: #fafafa;
   overflow: hidden;
 }
 
+/* Heading */
 .new-collections-new h1 {
   font-size: 2.2rem;
   font-weight: 700;
@@ -21,13 +22,14 @@
   border-radius: 4px;
 }
 
+/* GRID */
 .collections {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
 }
 
-/* wrapper for lift + badge */
+/* ITEM WRAPPER */
 .collection-item-wrapper {
   position: relative;
   background: #fff;
@@ -35,54 +37,33 @@
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transition: box-shadow 0.3s, transform 0.3s;
+  width: 100%;   /* Important */
 }
 
-.collection-item-wrapper:hover {
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-}
-
-/* sparkle badge */
-.sparkle-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 1.2rem;
-  animation: sparkle 1.5s ease-in-out infinite;
-  z-index: 2;
-  pointer-events: none;
-}
-
-@keyframes sparkle {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
-  50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
-}
-
-/* shimmer on first load */
-.collection-item-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -150%;
+/* IMAGE FIX */
+.collection-item-wrapper img {
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transform: skewX(-20deg);
-  animation: shimmer 1.2s ease-out;
-  z-index: 1;
-  pointer-events: none;
+  height: auto;
+  display: block;
 }
 
-@keyframes shimmer {
-  to { left: 150%; }
-}
-
-/* mobile */
-@media (max-width: 600px) {
-  .collections {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
+/* MOBILE FIX */
+@media (max-width: 768px) {
+  .new-collections-new {
+    padding: 2rem 4vw;
   }
+
+  .collections {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .collections {
+    grid-template-columns: 1fr;
+  }
+
   .new-collections-new h1 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
 }
