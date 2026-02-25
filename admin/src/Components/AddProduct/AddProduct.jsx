@@ -147,7 +147,7 @@ const AddProduct = () => {
         >
           <option value="women">Women</option>
           <option value="men">Men</option>
-          <option value="kids">Kids</option> {/* ✅ FIXED */}
+          <option value="kids">Kids</option>
         </select>
       </div>
 
