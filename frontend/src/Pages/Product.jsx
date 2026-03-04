@@ -5,7 +5,7 @@ import DescriptionBox from '../Components/DescriptionBox/DescriptionBox';
 import RelatedProducts from '../Components/RelatedProducts/RelatedProducts';
 import { useParams } from 'react-router-dom';
 import { ShopContext } from '../Context/ShopContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const Product = () => {
   const { products } = useContext(ShopContext);
@@ -13,7 +13,10 @@ const Product = () => {
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    setProduct(products.find((e) => e.id === Number(productId)));
+    if (products.length > 0) {
+      const foundProduct = products.find((e) => e._id === productId);
+      setProduct(foundProduct);
+    }
   }, [products, productId]);
 
   if (!product) return <SkeletonPage />;
@@ -39,23 +42,27 @@ const Product = () => {
       variants={pageVariants}
     >
       <ParallaxBg />
+
       <motion.div variants={sectionVariants}>
         <Breadcrums product={product} />
       </motion.div>
+
       <motion.div variants={sectionVariants}>
         <ProductDisplay product={product} />
       </motion.div>
+
       <motion.div variants={sectionVariants}>
         <DescriptionBox />
       </motion.div>
+
       <motion.div variants={sectionVariants}>
-        <RelatedProducts id={product.id} category={product.category} />
+        <RelatedProducts _id={product._id} category={product.category} />
       </motion.div>
     </motion.div>
   );
 };
 
-/* ----------  skeleton while loading  ---------- */
+/* ---------- Skeleton while loading ---------- */
 const SkeletonPage = () => (
   <div className="skeleton-product">
     <div className="sk-block sk-bread" />
@@ -65,7 +72,7 @@ const SkeletonPage = () => (
   </div>
 );
 
-/* ----------  subtle parallax background  ---------- */
+/* ---------- Parallax background ---------- */
 const ParallaxBg = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
@@ -75,7 +82,7 @@ const ParallaxBg = () => {
     setOffset({ x, y });
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);

@@ -69,6 +69,12 @@ const Navbar = () => {
           </Link>
         )}
 
+        <Link to="/myorders">
+          <div className="nav-orders">
+            📦 Orders
+          </div>
+        </Link>
+
         <Link to="/cart" className="cart-link">
           <img src={cart_icon} alt="cart" />
           {cartCount > 0 && (

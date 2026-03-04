@@ -116,7 +116,7 @@ exports.addProduct = async (req, res, next) => {
 
 exports.removeProduct = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { id } = req.body;   
 
     const product = await Product.findByIdAndDelete(id);
 
@@ -131,6 +131,7 @@ exports.removeProduct = async (req, res, next) => {
       success: true,
       message: `Product "${product.name}" removed successfully`,
     });
+
   } catch (error) {
     next(error);
   }

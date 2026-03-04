@@ -1,25 +1,35 @@
 const jwt = require("jsonwebtoken");
 
-const authenticateUser = async (req, res, next) => {
-    const token = req.header("auth-token");
+const authenticateUser = (req, res, next) => {
 
-    if (!token) {
-        return res.status(401).json({
-            success: false,
-            errors: "Please authenticate using a valid token",
-        });
-    }
+  const token = req.header("auth-token");
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded.user;
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            success: false,
-            errors: "Invalid or expired token",
-        });
-    }
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Token missing"
+    });
+  }
+
+  try {
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = {
+      id: decoded.user?.id || decoded.id
+    };
+
+    next();
+
+  } catch (error) {
+
+    return res.status(401).json({
+      success: false,
+      message: "Invalid token"
+    });
+
+  }
+
 };
 
 module.exports = authenticateUser;

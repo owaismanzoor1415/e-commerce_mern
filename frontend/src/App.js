@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Shop from "./Pages/Shop";
 import Cart from "./Pages/Cart";
+import MyOrders from "./Pages/MyOrders";
 import Product from "./Pages/Product";
 import Footer from "./Components/Footer/Footer";
 import ShopCategory from "./Pages/ShopCategory";
@@ -78,6 +79,7 @@ function App() {
           <Route path="/checkout" element={<AnimatedPage><Checkout /></AnimatedPage>} />
           <Route path="/verify" element={<AnimatedPage><Verify /></AnimatedPage>} />
           <Route path="/cart" element={<AnimatedPage><Cart /></AnimatedPage>} />
+          <Route path="/myorders" element={<MyOrders/>}/>
           <Route path="/login" element={<AnimatedPage><LoginSignup /></AnimatedPage>} />
           <Route path="/description" element={<DescriptionBox />} />
         </Routes>

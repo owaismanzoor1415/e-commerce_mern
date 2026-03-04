@@ -8,9 +8,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNotification } from '../../Context/NotificationContext';
 
 const CartItems = () => {
+
   const { products, cartItems, removeFromCart, getTotalCartAmount, addToCart } =
     useContext(ShopContext);
-  const { success, warning, info } = useNotification();
+
+  const { success, warning } = useNotification();
   const navigate = useNavigate();
 
   const [promo, setPromo] = useState('');
@@ -20,117 +22,152 @@ const CartItems = () => {
   const discountAmount = Math.round((subtotal * discountPercent) / 100);
   const total = subtotal - discountAmount;
 
-  /* promo handler */
   const applyPromo = () => {
+
     const code = promo.toUpperCase().trim();
 
     if (code === 'SAVE10') {
       setDiscountPercent(10);
       success('10% discount applied');
-    } else if (code === 'SAVE20') {
+    }
+    else if (code === 'SAVE20') {
       setDiscountPercent(20);
       success('20% discount applied');
-    } else {
+    }
+    else {
       setDiscountPercent(0);
       warning('Invalid promo code');
     }
+
   };
 
-  /* animate on total change */
   useEffect(() => {
+
     const el = document.querySelector('.total-value');
+
     if (el) el.classList.add('pulse');
+
     setTimeout(() => el?.classList.remove('pulse'), 600);
+
   }, [total]);
+
 
   const cartList = Object.entries(cartItems)
     .filter(([, qty]) => qty > 0)
-    .map(([id, qty]) => products.find((p) => p.id === Number(id)))
+    .map(([id]) => products.find((p) => p._id === id))
     .filter(Boolean);
 
+
   return (
+
     <div className="cartitems">
+
       <div className="cartitems-format-main headings">
-        <p>Products</p> <p>Title</p> <p>Price</p> <p>Quantity</p> <p>Total</p> <p>Remove</p>
+        <p>Products</p>
+        <p>Title</p>
+        <p>Price</p>
+        <p>Quantity</p>
+        <p>Total</p>
+        <p>Remove</p>
       </div>
+
       <hr />
 
       <AnimatePresence>
-        {cartList.map((e) => (
+
+        {cartList.map((item) => (
+
           <CartRow
-            key={e.id}
-            item={e}
-            qty={cartItems[e.id]}
-            remove={() => removeFromCart(e.id)}
-            changeQty={(delta, silent = false) => addToCart(e.id, delta, '', silent)}
+            key={item._id}
+            item={item}
+            qty={cartItems[item._id]}
+            remove={() => removeFromCart(item._id)}
+            changeQty={(delta) => addToCart(item._id, delta, '', true)}
           />
+
         ))}
+
       </AnimatePresence>
 
       {cartList.length === 0 && <SkeletonCart />}
 
       <div className="cartitems-down">
+
         <motion.div
           className="cartitems-total"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
         >
+
           <h1>Cart Totals</h1>
-          <div>
-            <div className="cartitems-total-item">
-              <p>Subtotal</p>
-              <p>{currency}{subtotal}</p>
-            </div>
-            <hr />
 
-            {discountPercent > 0 && (
-              <div className="cartitems-total-item discount">
-                <p>Discount ({discountPercent}%)</p>
-                <p>- {currency}{discountAmount}</p>
-              </div>
-            )}
-
-            <div className="cartitems-total-item">
-              <p>Shipping Fee</p>
-              <p>Free</p>
-            </div>
-            <hr />
-
-            <div className="cartitems-total-item">
-              <h3>Total</h3>
-              <h3 className="total-value">{currency}{total}</h3>
-            </div>
+          <div className="cartitems-total-item">
+            <p>Subtotal</p>
+            <p>{currency}{subtotal}</p>
           </div>
 
-          {/* ✅ ONLY NAVIGATION, NO HISTORY, NO MESSAGE */}
+          {discountPercent > 0 && (
+
+            <div className="cartitems-total-item discount">
+              <p>Discount ({discountPercent}%)</p>
+              <p>- {currency}{discountAmount}</p>
+            </div>
+
+          )}
+
+          <div className="cartitems-total-item">
+            <p>Shipping Fee</p>
+            <p>Free</p>
+          </div>
+
+          <div className="cartitems-total-item">
+            <h3>Total</h3>
+            <h3 className="total-value">{currency}{total}</h3>
+          </div>
+
           <button onClick={() => navigate('/Checkout')}>
             PROCEED TO CHECKOUT
           </button>
+
         </motion.div>
 
-        {/* PROMO CODE */}
+
         <div className="cartitems-promocode">
+
           <p>Have a promo code?</p>
+
           <div className="cartitems-promobox">
+
             <input
               type="text"
               placeholder="SAVE10 / SAVE20"
               value={promo}
               onChange={(e) => setPromo(e.target.value)}
             />
+
             <button onClick={applyPromo}>Apply</button>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
+
   );
+
 };
 
-/* cart row */
+
+/* ================= CART ROW ================= */
+
 const CartRow = ({ item, qty, remove, changeQty }) => {
+
   const { success, info } = useNotification();
 
   return (
+
     <motion.div
       layout
       initial={{ opacity: 0, x: -40 }}
@@ -139,50 +176,69 @@ const CartRow = ({ item, qty, remove, changeQty }) => {
       transition={{ duration: 0.35 }}
       className="cartitems-format-main cartitems-format"
     >
+
       <img
         className="cartitems-product-icon"
         src={item.image.startsWith('http') ? item.image : backend_url + item.image}
         alt={item.name}
       />
-      <p className="cartitems-product-title">{item.name}</p>
+
+      <p>{item.name}</p>
+
       <p>{currency}{item.new_price}</p>
 
+
       <div className="qty-stepper">
+
         <button
           onClick={() => {
-            changeQty(-1, true);
+            changeQty(-1);
             info(`${item.name} removed from cart!`);
           }}
           disabled={qty <= 1}
         >
           -
         </button>
+
         <span>{qty}</span>
+
         <button
           onClick={() => {
-            changeQty(1, true);
+            changeQty(1);
             success(`${item.name} added to cart!`);
           }}
         >
           +
         </button>
+
       </div>
 
+
       <p>{currency}{(item.new_price * qty).toFixed(2)}</p>
+
+
       <img
         className="cartitems-remove-icon"
         src={cross_icon}
         alt="remove"
         onClick={remove}
       />
+
     </motion.div>
+
   );
+
 };
 
-/* skeleton */
+
+/* ================= SKELETON ================= */
+
 const SkeletonCart = () => (
+
   <div className="skeleton-cart">
+
     {Array.from({ length: 3 }).map((_, i) => (
+
       <div className="skeleton-row" key={i}>
         <div className="sk-img" />
         <div className="sk-title" />
@@ -191,8 +247,11 @@ const SkeletonCart = () => (
         <div className="sk-total" />
         <div className="sk-remove" />
       </div>
+
     ))}
+
   </div>
+
 );
 
 export default CartItems;

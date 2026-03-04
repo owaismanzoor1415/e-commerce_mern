@@ -13,7 +13,7 @@ const orderRoutes = require("./routes/orderRoutes");
 
 // Initialize express app
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 
 // Middleware
 app.use(express.json());

@@ -21,12 +21,12 @@ const Popular = (props) => {
         <div className="popular-item horizontal-row">
           {props.data.map((item) => (
             <motion.div
-              key={item.id}
+              key={item._id}
               className="card-wrapper"
               whileTap={{ scale: 0.97 }}
             >
               <Item
-                id={item.id}
+                _id={item._id}
                 name={item.name}
                 image={item.image}
                 new_price={item.new_price}

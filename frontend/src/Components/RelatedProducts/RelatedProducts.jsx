@@ -9,7 +9,10 @@ const RelatedProducts = ({ category, id }) => {
   useEffect(() => {
     fetch(`${backend_url}/relatedproducts`, {
       method: 'POST',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ category }),
     })
       .then((res) => res.json())
@@ -19,22 +22,24 @@ const RelatedProducts = ({ category, id }) => {
       });
   }, [category]);
 
-  const filtered = related.filter((item) => item.id !== id);
+  const filtered = related.filter((item) => item._id !== id);
 
   return (
     <div className="relatedproducts-max">
       <h1 className="whitish-title">Related Products</h1>
+
       <div className="related-grid">
         {filtered.map((item, i) => (
           <div
-            key={item.id}
+            key={item._id}  
             className="related-card"
             style={{ '--delay': i * 0.08 }}
           >
             <div className="hologram-badge">NEW</div>
             <div className="glow-edge" />
+
             <Item
-              id={item.id}
+              _id={item._id}     
               name={item.name}
               image={item.image}
               new_price={item.new_price}

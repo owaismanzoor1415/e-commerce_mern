@@ -37,7 +37,7 @@ const ShopCategory = (props) => {
   const bannerText = {
     men: { title: "Men’s Streetwear", sub: "Fresh drops, fearless style." },
     women: { title: "Women’s Collection", sub: "Trend-led looks you’ll love." },
-    kids: { title: "Kid’s Corner", sub: "Cute, comfy, colourful." }, // ✅ FIXED
+    kids: { title: "Kid’s Corner", sub: "Cute, comfy, colourful." }, 
   }[cat] || { title: cat, sub: "" };
 
   return (
@@ -58,13 +58,13 @@ const ShopCategory = (props) => {
       <div className="shopcategory-products">
         {filtered.map((item, i) => (
           <div
-            key={item.id}
+            key={item._id}
             className="product-card"
             style={{ "--delay": i * 0.1 }}
           >
             <div className="glow-edge" />
             <Item
-              id={item.id}
+              _id={item._id}
               name={item.name}
               image={item.image}
               new_price={item.new_price}

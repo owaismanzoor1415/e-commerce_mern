@@ -5,145 +5,214 @@ import { useNotification } from "./NotificationContext";
 export const ShopContext = createContext(null);
 
 const ShopContextProvider = (props) => {
-  const { success, warning, info } = useNotification(); // info restored
-  const [products, setProducts] = useState([]);
 
-  const getDefaultCart = () => {
-    let cart = {};
-    for (let i = 0; i < 300; i++) cart[i] = 0;
-    return cart;
-  };
-  const [cartItems, setCartItems] = useState(getDefaultCart());
+  const { success, warning, info } = useNotification();
+
+  const [products, setProducts] = useState([]);
+  const [cartItems, setCartItems] = useState({});
   const [cartItemsV2, setCartItemsV2] = useState({});
 
-  /* fetch products */
+  /* ================= FETCH PRODUCTS ================= */
+
   useEffect(() => {
+
     fetch(`${backend_url}/allproducts`)
       .then((res) => res.json())
       .then((data) => {
         if (data.products) setProducts(data.products);
         else if (Array.isArray(data)) setProducts(data);
-      });
+      })
+      .catch((err) => console.error("Failed to fetch products:", err));
+
   }, []);
 
-  /* migrate server cart */
-  useEffect(() => {
-    if (!localStorage.getItem("auth-token")) return;
-    fetch(`${backend_url}/getcart`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/form-data',
-        'auth-token': `${localStorage.getItem("auth-token")}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        const legacy = data.cartData || data || {};
-        setCartItems(legacy);
-        const rich = {};
-        Object.entries(legacy).forEach(([id, qty]) => {
-          if (qty <= 0) return;
-          const prod = products.find(p => p.id === Number(id));
-          if (!prod) return;
-          const key = `${id}_`;
-          rich[key] = { id: prod.id, name: prod.name, image: prod.image, new_price: prod.new_price, qty, size: '' };
-        });
-        setCartItemsV2(rich);
-      });
-  }, [products]);
 
-  /* totals */
-  const getTotalCartAmount = () => Object.values(cartItemsV2).reduce((t, i) => t + i.new_price * i.qty, 0);
-  const getTotalCartItems = () => Object.values(cartItemsV2).reduce((t, i) => t + i.qty, 0);
+  /* ================= FETCH CART ================= */
+
+  useEffect(() => {
+
+    if (!localStorage.getItem("auth-token")) return;
+
+    fetch(`${backend_url}/getcart`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "auth-token": localStorage.getItem("auth-token"),
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+
+        const cartData = data.cartData || data || {};
+
+        setCartItems(cartData);
+
+      })
+      .catch((err) => console.error("Failed to load cart:", err));
+
+  }, []);
+
+
+  /* ================= BUILD RICH CART ================= */
+
+  useEffect(() => {
+
+    if (!products.length) return;
+
+    const richCart = {};
+
+    Object.entries(cartItems).forEach(([id, qty]) => {
+
+      const product = products.find((p) => p._id === id);
+
+      if (product && qty > 0) {
+
+        const key = `${id}_`;
+
+        richCart[key] = {
+          _id: product._id,
+          name: product.name,
+          image: product.image,
+          new_price: product.new_price,
+          qty: qty,
+          size: ""
+        };
+
+      }
+
+    });
+
+    setCartItemsV2(richCart);
+
+  }, [products, cartItems]);
+
+
+  /* ================= TOTALS ================= */
+
+  const getTotalCartAmount = () =>
+    Object.values(cartItemsV2).reduce(
+      (total, item) => total + item.new_price * item.qty,
+      0
+    );
+
+  const getTotalCartItems = () =>
+    Object.values(cartItemsV2).reduce(
+      (total, item) => total + item.qty,
+      0
+    );
+
   const getCartDetails = () => Object.values(cartItemsV2);
 
-  /* addToCart with silent flag */
-  const addToCart = (itemId, qty = 1, size = '', silent = false) => {
+
+  /* ================= ADD TO CART ================= */
+
+  const addToCart = (productId, qty = 1, size = "", silent = false) => {
+
     if (!localStorage.getItem("auth-token")) {
       warning("Please login to add items to cart!");
       return;
     }
-    const prod = products.find(p => p.id === itemId);
-    if (!prod) return;
 
-    const key = `${itemId}_${size}`;
+    const product = products.find((p) => p._id === productId);
+    if (!product) return;
 
-    setCartItems(prev => ({ ...prev, [itemId]: (prev[itemId] || 0) + qty }));
-    setCartItemsV2(prev => ({
+    const key = `${productId}_${size}`;
+
+    setCartItems((prev) => ({
+      ...prev,
+      [productId]: (prev[productId] || 0) + qty,
+    }));
+
+    setCartItemsV2((prev) => ({
       ...prev,
       [key]: {
-        id: itemId,
-        name: prod.name,
-        image: prod.image,
-        new_price: prod.new_price,
+        _id: product._id,
+        name: product.name,
+        image: product.image,
+        new_price: product.new_price,
         qty: (prev[key]?.qty || 0) + qty,
         size,
       },
     }));
 
-    if (!silent) success(`${prod.name} added to cart!`);
+    if (!silent) success(`${product.name} added to cart!`);
 
-    if (localStorage.getItem("auth-token")) {
-      fetch(`${backend_url}/addtocart`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/form-data',
-          'auth-token': `${localStorage.getItem("auth-token")}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ itemId }),
-      }).catch(() => console.error("Failed to sync add"));
-    }
+    fetch(`${backend_url}/addtocart`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "auth-token": localStorage.getItem("auth-token"),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ itemId: productId }),
+    }).catch(() => console.error("Failed to sync add"));
+
   };
 
-  /* removeFromCart – shows product-specific toast */
-  const removeFromCart = (itemId, size = '') => {
-    const key = `${itemId}_${size}`;
-    const prod = products.find(p => p.id === itemId);
 
-    setCartItems(prev => ({ ...prev, [itemId]: Math.max(0, (prev[itemId] || 0) - 1) }));
-    setCartItemsV2(prev => {
-      const copy = { ...prev };
-      if (!copy[key]) return prev;
-      copy[key].qty -= 1;
-      if (copy[key].qty <= 0) delete copy[key];
-      return copy;
+  /* ================= REMOVE FROM CART ================= */
+
+  const removeFromCart = (productId, size = "") => {
+
+    const key = `${productId}_${size}`;
+
+    const product = products.find((p) => p._id === productId);
+
+    setCartItems((prev) => ({
+      ...prev,
+      [productId]: Math.max(0, (prev[productId] || 0) - 1),
+    }));
+
+    setCartItemsV2((prev) => {
+
+      const updated = { ...prev };
+
+      if (!updated[key]) return prev;
+
+      updated[key].qty -= 1;
+
+      if (updated[key].qty <= 0) delete updated[key];
+
+      return updated;
+
     });
 
-    /* NEW: quiet removal message */
-    if (prod) info(`${prod.name} removed from cart!`);
+    if (product) info(`${product.name} removed from cart!`);
 
-    if (localStorage.getItem("auth-token")) {
-      fetch(`${backend_url}/removefromcart`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/form-data',
-          'auth-token': `${localStorage.getItem("auth-token")}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ itemId }),
-      }).catch(() => console.error("Failed to sync remove"));
-    }
+    fetch(`${backend_url}/removefromcart`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "auth-token": localStorage.getItem("auth-token"),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ itemId: productId }),
+    }).catch(() => console.error("Failed to sync remove"));
+
   };
+
+
+  /* ================= CONTEXT VALUE ================= */
 
   const contextValue = {
     products,
-    getTotalCartItems,
     cartItems,
     cartItemsV2,
+    getTotalCartAmount,
+    getTotalCartItems,
     getCartDetails,
     addToCart,
     removeFromCart,
-    getTotalCartAmount,
   };
+
 
   return (
     <ShopContext.Provider value={contextValue}>
       {props.children}
     </ShopContext.Provider>
   );
+
 };
 
 export default ShopContextProvider;

@@ -9,19 +9,24 @@ import { useNotification } from '../../Context/NotificationContext';
 import { motion } from 'framer-motion';
 
 const ProductDisplay = ({ product }) => {
+
   const { addToCart, removeFromCart } = useContext(ShopContext);
   const { warning, success } = useNotification();
+
   const [selectedSize, setSelectedSize] = useState('');
   const [qty, setQty] = useState(1);
   const [mainIdx, setMainIdx] = useState(0);
+
   const navigate = useNavigate();
 
   const handleAddToCart = () => {
-  if (!selectedSize) return warning('Please select a size');
-  addToCart(product.id, qty, selectedSize, true); // silent
-  success('Added to cart!');
-  setTimeout(() => navigate('/cart'), 600);
-};
+    if (!selectedSize) return warning('Please select a size');
+
+    addToCart(product._id, qty, selectedSize, true);
+
+    success('Added to cart!');
+    setTimeout(() => navigate('/cart'), 600);
+  };
 
   const thumbnails = [product.image, product.image, product.image, product.image];
 
@@ -37,10 +42,15 @@ const ProductDisplay = ({ product }) => {
       animate="visible"
       variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
     >
+
       {/* LEFT – gallery */}
+
       <motion.div className="productdisplay-left" variants={sectionAnim}>
+
         <div className="productdisplay-img-list">
+
           {thumbnails.map((img, idx) => (
+
             <motion.img
               key={idx}
               src={img.startsWith('http') ? img : backend_url + img}
@@ -49,10 +59,13 @@ const ProductDisplay = ({ product }) => {
               onClick={() => setMainIdx(idx)}
               whileTap={{ scale: 0.92 }}
             />
+
           ))}
+
         </div>
 
         <div className="productdisplay-img">
+
           <motion.img
             className="productdisplay-main-img"
             src={thumbnails[mainIdx].startsWith('http') ? thumbnails[mainIdx] : backend_url + thumbnails[mainIdx]}
@@ -60,11 +73,16 @@ const ProductDisplay = ({ product }) => {
             whileHover={{ scale: 1.08 }}
             transition={{ duration: 0.3 }}
           />
+
         </div>
+
       </motion.div>
 
+
       {/* RIGHT – info */}
+
       <motion.div className="productdisplay-right" variants={sectionAnim}>
+
         <motion.h1>{product.name}</motion.h1>
 
         <div className="productdisplay-right-stars">
@@ -82,11 +100,17 @@ const ProductDisplay = ({ product }) => {
           {product.description}
         </motion.p>
 
+
         {/* SIZE */}
+
         <motion.div className="productdisplay-right-size" variants={sectionAnim}>
+
           <h3>Select Size</h3>
+
           <div className="productdisplay-right-sizes">
+
             {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+
               <motion.div
                 key={size}
                 className={selectedSize === size ? 'active' : ''}
@@ -95,19 +119,25 @@ const ProductDisplay = ({ product }) => {
               >
                 {size}
               </motion.div>
+
             ))}
+
           </div>
+
         </motion.div>
 
+
         {/* QTY + ADD */}
+
         <motion.div className="productdisplay-qty-add" variants={sectionAnim}>
+
           <div className="qty-stepper">
-            {/* MINUS – direct call → shows toast */}
+
             <button
               onClick={() => {
                 if (qty === 1) return;
                 setQty((q) => q - 1);
-                removeFromCart(product.id, selectedSize);
+                removeFromCart(product._id, selectedSize);
               }}
             >
               -
@@ -115,15 +145,15 @@ const ProductDisplay = ({ product }) => {
 
             <span>{qty}</span>
 
-            {/* PLUS – shows toast */}
             <button
               onClick={() => {
                 setQty((q) => q + 1);
-                addToCart(product.id, 1, selectedSize);
+                addToCart(product._id, 1, selectedSize);
               }}
             >
               +
             </button>
+
           </div>
 
           <motion.button
@@ -133,44 +163,58 @@ const ProductDisplay = ({ product }) => {
           >
             ADD TO CART
           </motion.button>
+
         </motion.div>
+
 
         <motion.p className="productdisplay-right-category" variants={sectionAnim}>
           <span>Category :</span> Jackets, T-shirt, Crop Top
         </motion.p>
+
         <motion.p className="productdisplay-right-category" variants={sectionAnim}>
           <span>Tags :</span> Modern, Latest, Trending
         </motion.p>
+
       </motion.div>
 
-      {/* sticky mobile bar */}
+
+      {/* mobile bar */}
+
       <div className="productdisplay-mobile-bar">
+
         <div className="qty-stepper">
+
           <button
             onClick={() => {
               if (qty === 1) return;
               setQty((q) => q - 1);
-              removeFromCart(product.id, selectedSize); // direct → toast
+              removeFromCart(product._id, selectedSize);
             }}
           >
             -
           </button>
+
           <span>{qty}</span>
+
           <button
             onClick={() => {
               setQty((q) => q + 1);
-              addToCart(product.id, 1, selectedSize);
+              addToCart(product._id, 1, selectedSize);
             }}
           >
             +
-            </button>
-          </div>
-          <button className="add-to-cart-btn" onClick={handleAddToCart}>
-            ADD TO CART
           </button>
+
         </div>
-      </motion.div>
-    );
+
+        <button className="add-to-cart-btn" onClick={handleAddToCart}>
+          ADD TO CART
+        </button>
+
+      </div>
+
+    </motion.div>
+  );
 };
 
 export default ProductDisplay;

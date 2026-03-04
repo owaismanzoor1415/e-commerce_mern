@@ -31,6 +31,7 @@ const NewCollections = ({ data }) => {
       >
         NEW COLLECTIONS
       </motion.h1>
+
       <motion.hr
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
@@ -38,16 +39,17 @@ const NewCollections = ({ data }) => {
       />
 
       <motion.div className="collections" variants={container}>
-        {data.map((item, index) => (
+        {data.map((item) => (
           <motion.div
-            key={item.id}
+            key={item._id}   // ✅ FIXED
             className="collection-item-wrapper"
             variants={itemAnim}
             whileHover={{ y: -8, transition: { duration: 0.25 } }}
           >
             <div className="sparkle-badge">✨</div>
+
             <Item
-              id={item.id}
+              _id={item._id}        // ✅ FIXED
               name={item.name}
               image={item.image}
               new_price={item.new_price}
