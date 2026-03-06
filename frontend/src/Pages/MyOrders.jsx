@@ -10,8 +10,8 @@ const MyOrders = () => {
 
     try {
 
-      const response = await fetch(`${backend_url}/api/order/user`, {
-        method: "GET",
+      const response = await fetch(`${backend_url}/api/order/userorders`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "auth-token": localStorage.getItem("auth-token")

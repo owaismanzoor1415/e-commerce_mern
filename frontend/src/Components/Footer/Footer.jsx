@@ -10,7 +10,7 @@ const Footer = () => {
   const [ripple, setRipple] = useState(null);
 
   const socials = [
-    { id: 'linkedin', icon: <FaLinkedin />, url: 'https://linkedin.com' },
+    { id: 'linkedin', icon: <FaLinkedin />, url: 'https://www.linkedin.com/in/owais-manzoor-989314261/' },
     { id: 'instagram', icon: <FaInstagram />, url: 'https://instagram.com' },
     { id: 'whatsapp', icon: <FaWhatsapp />, url: 'https://wa.me/91xxxxxxxxxx' },
   ];

@@ -222,7 +222,7 @@ const userOrders = async (req, res) => {
       });
     }
 
-    const orders = await Order.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ userId: req.user.id || req.user._id }).sort({ createdAt: -1 });
     res.json({
       success: true,
       data: orders

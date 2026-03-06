@@ -14,6 +14,6 @@ router.post("/stripe", auth, placeOrderStripe); // Stripe
 router.post("/verify", auth, verifyOrder); // Verify Payment
 
 // User Features
-router.post("/userorders", auth, userOrders);
+router.get("/user", auth, userOrders);
 
 module.exports = router;
