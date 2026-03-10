@@ -15,6 +15,7 @@ import men_banner from "./Components/Assets/banner_mens.png";
 import kid_banner from "./Components/Assets/banner_kids.png";
 import LoginSignup from "./Pages/LoginSignup";
 import Verify from "./Pages/Verify";
+import Search from './Pages/Search';
 
 export const backend_url = process.env.REACT_APP_BACKEND_URL;
 export const currency = '₹';
@@ -82,6 +83,7 @@ function App() {
           <Route path="/myorders" element={<MyOrders/>}/>
           <Route path="/login" element={<AnimatedPage><LoginSignup /></AnimatedPage>} />
           <Route path="/description" element={<DescriptionBox />} />
+          <Route path="/search" element={<Search />} />
         </Routes>
       </AnimatePresence>
       <Footer />

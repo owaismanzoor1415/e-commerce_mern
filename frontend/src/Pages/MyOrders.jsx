@@ -4,133 +4,140 @@ import "./MyOrders.css";
 
 const MyOrders = () => {
 
-  const [orders, setOrders] = useState([]);
+const [orders, setOrders] = useState([]);
 
-  const fetchOrders = async () => {
+const fetchOrders = async () => {
+try {
 
-    try {
-
-      const response = await fetch(`${backend_url}/api/order/userorders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "auth-token": localStorage.getItem("auth-token")
-        }
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setOrders(data.data);
-      }
-
-    } catch (error) {
-      console.log("Order fetch error:", error);
+  const response = await fetch(`${backend_url}/api/order/userorders`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "auth-token": localStorage.getItem("auth-token")
     }
+  });
 
-  };
+  const data = await response.json();
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  if (data.success) {
+    setOrders(data.data || []);
+  }
 
+} catch (error) {
+  console.log("Order fetch error:", error);
+}
 
-  return (
-    <div className="myorders">
+};
 
-      <h1>My Orders</h1>
+useEffect(() => {
+fetchOrders();
+}, []);
 
-      {orders.length === 0 && (
-        <p className="empty">You have not placed any orders yet.</p>
-      )}
+const steps = [
+"Order Placed",
+"Processing",
+"Shipped",
+"Out for delivery",
+"Delivered"
+];
 
-      {orders.map((order) => (
+return (
 
-        <div key={order._id} className="order-card">
+<div className="myorders">
 
-          <div className="order-header">
+  <h1>My Orders</h1>
 
-            <div>
-              <p><b>Order ID:</b> {order._id}</p>
-              <p className="date">
-                {new Date(order.createdAt).toLocaleDateString()}
-              </p>
-            </div>
+  {orders.length === 0 && (
+    <p className="empty">You have not placed any orders yet.</p>
+  )}
 
-            <div className="amount">
-              {currency}{order.amount}
-            </div>
+  {orders.map((order) => {
 
-            <div className={`status ${order.status}`}>
-              {order.status || "Processing"}
-            </div>
+    const status = order.status || "Processing";
+    const currentStep = steps.indexOf(status);
 
+    return (
+
+      <div key={order._id} className="order-card">
+
+        {/* HEADER */}
+        <div className="order-header">
+
+          <div>
+            <p><b>Order ID:</b> {order._id}</p>
+
+            <p className="date">
+              {new Date(order.createdAt || order.date).toLocaleDateString()}
+            </p>
           </div>
 
-
-          {/* ORDER PROGRESS BAR */}
-          <div className="order-progress">
-
-            <span className={order.status === "Order Placed" ? "active" : ""}>
-              Order Placed
-            </span>
-
-            <span className={order.status === "Processing" ? "active" : ""}>
-              Processing
-            </span>
-
-            <span className={order.status === "Shipped" ? "active" : ""}>
-              Shipped
-            </span>
-
-            <span className={order.status === "Out for delivery" ? "active" : ""}>
-              Out for delivery
-            </span>
-
-            <span className={order.status === "Delivered" ? "active" : ""}>
-              Delivered
-            </span>
-
+          <div className="amount">
+            {currency}{order.amount}
           </div>
 
-
-          <div className="order-products">
-
-            {order.products.map((item, index) => (
-
-              <div key={index} className="order-product">
-
-                <img
-                  src={
-                    item.image?.startsWith("http")
-                      ? item.image
-                      : backend_url + item.image
-                  }
-                  alt=""
-                />
-
-                <div className="details">
-
-                  <p className="name">{item.name}</p>
-
-                  <p>Quantity: {item.quantity}</p>
-
-                  <p>Price: {currency}{item.price}</p>
-
-                </div>
-
-              </div>
-
-            ))}
-
+          <div className={`status ${status}`}>
+            {status}
           </div>
 
         </div>
 
-      ))}
 
-    </div>
-  );
+        {/* ORDER PROGRESS */}
+        <div className="order-progress">
+
+          {steps.map((step, index) => (
+            <span
+              key={step}
+              className={index <= currentStep ? "active" : ""}
+            >
+              {step}
+            </span>
+          ))}
+
+        </div>
+
+
+        {/* PRODUCTS */}
+        <div className="order-products">
+
+          {(order.products || []).map((item, index) => (
+
+            <div key={index} className="order-product">
+
+              <img
+                src={
+                  item.image?.startsWith("http")
+                    ? item.image
+                    : backend_url + item.image
+                }
+                alt={item.name}
+              />
+
+              <div className="details">
+
+                <p className="name">{item.name}</p>
+
+                <p>Quantity: {item.quantity}</p>
+
+                <p>Price: {currency}{item.price}</p>
+
+              </div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      </div>
+
+    );
+
+  })}
+
+</div>
+
+);
 };
 
 export default MyOrders;

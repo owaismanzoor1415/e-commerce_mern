@@ -1,104 +1,146 @@
 const User = require("../models/User");
 
-// @desc    Add item to cart
-// @route   POST /api/cart/add
-// @access  Private
-exports.addToCart = async (req, res, next) => {
-    try {
-        const { itemId } = req.body;
+/* ================= ADD TO CART ================= */
 
-        if (!itemId && itemId !== 0) {
-            return res.status(400).json({
-                success: false,
-                errors: "Item ID is required",
-            });
-        }
+exports.addToCart = async (req, res) => {
 
-        const user = await User.findById(req.user.id);
+  try {
 
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                errors: "User not found",
-            });
-        }
+    const userId = req.user.id;
+    const { itemId } = req.body;
 
-        // Initialize if doesn't exist
-        if (!user.cartData[itemId]) {
-            user.cartData[itemId] = 0;
-        }
-
-        user.cartData[itemId] += 1;
-        await user.save();
-
-        res.json({
-            success: true,
-            message: "Item added to cart",
-            cartData: user.cartData,
-        });
-    } catch (error) {
-        next(error);
+    if (!itemId && itemId !== 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Item ID is required"
+      });
     }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    let cartData = user.cartData || {};
+
+    if (cartData[itemId]) {
+      cartData[itemId] += 1;
+    } else {
+      cartData[itemId] = 1;
+    }
+
+    await User.findByIdAndUpdate(userId, { cartData });
+
+    res.json({
+      success: true,
+      message: "Item added to cart",
+      cartData
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+
 };
 
-// @desc    Remove item from cart
-// @route   POST /api/cart/remove
-// @access  Private
-exports.removeFromCart = async (req, res, next) => {
-    try {
-        const { itemId } = req.body;
 
-        if (!itemId && itemId !== 0) {
-            return res.status(400).json({
-                success: false,
-                errors: "Item ID is required",
-            });
-        }
+/* ================= REMOVE FROM CART ================= */
 
-        const user = await User.findById(req.user.id);
+exports.removeFromCart = async (req, res) => {
 
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                errors: "User not found",
-            });
-        }
+  try {
 
-        if (user.cartData[itemId] && user.cartData[itemId] > 0) {
-            user.cartData[itemId] -= 1;
-        }
+    const userId = req.user.id;
+    const { itemId } = req.body;
 
-        await user.save();
-
-        res.json({
-            success: true,
-            message: "Item removed from cart",
-            cartData: user.cartData,
-        });
-    } catch (error) {
-        next(error);
+    if (!itemId && itemId !== 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Item ID is required"
+      });
     }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    let cartData = user.cartData || {};
+
+    if (cartData[itemId] && cartData[itemId] > 0) {
+      cartData[itemId] -= 1;
+
+      if (cartData[itemId] === 0) {
+        delete cartData[itemId];
+      }
+    }
+
+    await User.findByIdAndUpdate(userId, { cartData });
+
+    res.json({
+      success: true,
+      message: "Item removed from cart",
+      cartData
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+
+  }
+
 };
 
-// @desc    Get user cart
-// @route   GET /api/cart
-// @access  Private
-exports.getCart = async (req, res, next) => {
-    try {
-        const user = await User.findById(req.user.id);
 
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                errors: "User not found",
-            });
-        }
+/* ================= GET CART ================= */
 
-        res.json({
-            success: true,
-            cartData: user.cartData,
-        });
-    } catch (error) {
-        next(error);
+exports.getCart = async (req, res) => {
+
+  try {
+
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
     }
+
+    res.json({
+      success: true,
+      cartData: user.cartData || {}
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+
+  }
+
 };

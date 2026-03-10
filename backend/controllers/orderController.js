@@ -21,24 +21,8 @@ try {
 const placeOrder = async (req, res) => {
   try {
 
-    /* check authentication */
-    if (!req.user || !req.user.id) {
-      return res.json({
-        success: false,
-        message: "User not authenticated"
-      });
-    }
-
     const userId = req.user.id;
-
     const { items, amount, address, paymentMethod } = req.body;
-
-    if (!items || items.length === 0) {
-      return res.json({
-        success: false,
-        message: "Cart is empty"
-      });
-    }
 
     const newOrder = new Order({
       userId,
@@ -46,12 +30,12 @@ const placeOrder = async (req, res) => {
       amount,
       address,
       paymentMethod,
-      payment: false
+      payment: false,
+      status: "Order Placed"  
     });
 
     await newOrder.save();
 
-    /* clear cart */
     await User.findByIdAndUpdate(userId, { cartData: {} });
 
     res.json({
@@ -60,7 +44,7 @@ const placeOrder = async (req, res) => {
     });
 
   } catch (error) {
-    console.log("ORDER ERROR:", error);
+    console.log(error);
     res.json({
       success: false,
       message: "Error placing order"
@@ -92,7 +76,8 @@ const placeOrderStripe = async (req, res) => {
       amount,
       address,
       paymentMethod: "Stripe",
-      payment: false
+      payment: false,
+      status: "Order Placed"
     });
 
     await newOrder.save();

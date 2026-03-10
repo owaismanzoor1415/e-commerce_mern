@@ -87,18 +87,21 @@ color:gray;
 
 .order-progress{
 display:flex;
-gap:15px;
-margin-top:10px;
-font-size:13px;
+justify-content:space-between;
+margin:20px 0;
+font-size:14px;
 }
 
 .order-progress span{
-padding:5px 10px;
-border-radius:20px;
-background:#eee;
+flex:1;
+text-align:center;
+padding:8px;
+border-bottom:3px solid #ddd;
+color:#999;
 }
 
-.order-progress .active{
-background:#4caf50;
-color:white;
+.order-progress span.active{
+border-color:#2ecc71;
+color:#2ecc71;
+font-weight:600;
 }

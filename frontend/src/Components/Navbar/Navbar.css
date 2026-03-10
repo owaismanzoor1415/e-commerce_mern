@@ -2,47 +2,100 @@
   --accent: #ff4141;
 }
 
-/* ----------  glassy sticky bar ---------- */
+/* ---------- NAVBAR CONTAINER ---------- */
 .nav {
   position: sticky;
   top: 0;
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem 4vw;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+/* ---------- TOP BAR ---------- */
+.nav-top{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:10px 4vw;
+gap:20px;
+}
+
+.nav-search{
+flex:1;
+display:flex;
+justify-content:center;
+}
+
+.nav-search input{
+width:80%;
+padding:12px 20px;
+border-radius:30px;
+border:2px solid #ff4141;
+font-size:16px;
+outline:none;
+}
+
+/* ---------- LOGO ---------- */
 .nav-logo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
 }
+
 .nav-logo img {
   height: 2.2rem;
 }
+
 .nav-logo p {
   font-size: 1.5rem;
   font-weight: 600;
   color: #171717;
 }
 
-/* ----------  desktop menu ---------- */
+/* ---------- SEARCH BAR ---------- */
+.nav-search {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-search input {
+  width: 70%;
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: 2px solid var(--accent);
+  outline: none;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.nav-search input:focus {
+  box-shadow: 0 0 10px rgba(255, 65, 65, 0.4);
+}
+
+/* ---------- MENU BELOW SWIFTCART ---------- */
+
 .nav-menu {
   display: flex;
+  justify-content: flex-start;   /* align left instead of center */
+  align-items: center;
   gap: 2.5rem;
+
   list-style: none;
   margin: 0;
-  padding: 0;
+
+  padding: 10px 4vw;   /* same padding as navbar */
+  border-top: 1px solid rgba(0,0,0,0.05);
 }
-.nav-menu li {
-  position: relative;
+
+.nav-menu li:hover .underline{
+width:100%;
+position: relative;
 }
+
 .nav-menu a {
   text-decoration: none;
   color: #171717;
@@ -50,10 +103,14 @@
   font-weight: 500;
   transition: color 0.3s;
 }
+
 .nav-menu a:hover,
 .nav-menu a.active {
   color: var(--accent);
 }
+
+/* underline animation */
+
 .underline {
   position: absolute;
   bottom: -4px;
@@ -63,16 +120,18 @@
   background: var(--accent);
   transition: width 0.3s ease;
 }
+
 .underline.show {
   width: 100%;
 }
 
-/* ----------  login / cart ---------- */
+/* ---------- LOGIN / CART ---------- */
 .nav-login-cart {
   display: flex;
   align-items: center;
   gap: 1.2rem;
 }
+
 .nav-login-cart button {
   padding: 0.6rem 1.8rem;
   border: 1px solid #7a7a7a;
@@ -84,17 +143,21 @@
   cursor: pointer;
   transition: all 0.3s;
 }
+
 .nav-login-cart button:hover {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
 }
+
 .cart-link {
   position: relative;
 }
+
 .cart-link img {
   height: 1.6rem;
 }
+
 .nav-cart-count {
   position: absolute;
   top: -6px;
@@ -111,42 +174,62 @@
   justify-content: center;
 }
 
-/* pulse on count change */
+/* ---------- CART PULSE ---------- */
 @keyframes pulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.25); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
   100% { transform: scale(1); }
 }
+
 .pulse {
   animation: pulse 0.4s ease-out;
 }
 
-/* ----------  hamburger ---------- */
+/* ---------- HAMBURGER ---------- */
 .nav-dropdown {
   display: none;
   width: 2rem;
   cursor: pointer;
+  margin-left: 10px;
 }
 
-/* ----------  mobile ---------- */
-@media (max-width: 800px) {
-  .nav {
-    padding: 0.8rem 3vw; /* responsive padding */
+/* ---------- TABLET ---------- */
+@media (max-width: 900px) {
+
+  .nav-search input {
+    width: 90%;
+  }
+
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 768px) {
+
+  .nav-top {
+    padding: 0.8rem 3vw;
+  }
+
+  .nav-search {
+    display: none;
+  }
+
+  .nav-dropdown {
+    display: block;
   }
 
   .nav-menu {
     position: absolute;
-    top: 100%;
+    top: 70px;
     left: 0;
     width: 100%;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
-    padding: 2rem 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transform: translateY(-150%);
+    gap: 20px;
+    padding: 20px 0;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+    transform: translateY(-120%);
     opacity: 0;
     transition: transform 0.4s ease, opacity 0.4s ease;
   }
@@ -156,22 +239,20 @@
     opacity: 1;
   }
 
-  .nav-dropdown {
-    display: block;
-  }
-
   .underline {
-    display: none; /* hide slide underline on mobile */
+    display: none;
   }
 
   .nav-login-cart button {
     padding: 0.5rem 1.4rem;
     font-size: 0.9rem;
   }
+
 }
 
-/* ---------- extra small screens ---------- */
+/* ---------- SMALL PHONES ---------- */
 @media (max-width: 500px) {
+
   .nav-logo p {
     font-size: 1.2rem;
   }
@@ -189,4 +270,5 @@
     height: 1.1rem;
     font-size: 0.7rem;
   }
+
 }

@@ -1,24 +1,31 @@
 import React, { useContext, useRef, useState, useEffect } from 'react';
 import './Navbar.css';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../Assets/nav-logo.png';
 import cart_icon from '../Assets/cart_icon.png';
 import { ShopContext } from '../../Context/ShopContext';
 import nav_dropdown from '../Assets/nav_dropdown.png';
 
 const Navbar = () => {
+
   const [menu, setMenu] = useState('shop');
-  const { getTotalCartItems } = useContext(ShopContext);
+  const [search, setSearch] = useState('');
+
+  const { getTotalCartItems, products } = useContext(ShopContext);
+
   const menuRef = useRef();
   const location = useLocation();
+  const navigate = useNavigate();
 
-  /* sync active tab on refresh / direct visit */
   useEffect(() => {
+
     const path = location.pathname;
+
     if (path === '/') setMenu('shop');
     else if (path === '/mens') setMenu('mens');
     else if (path === '/womens') setMenu('womens');
     else if (path === '/kids') setMenu('kids');
+
   }, [location]);
 
   const dropdown_toggle = (e) => {
@@ -26,66 +33,92 @@ const Navbar = () => {
     e.target.classList.toggle('open');
   };
 
-  const cartCount = getTotalCartItems();
+  const handleSearch = (e) => {
+
+    if (e.key === "Enter") {
+
+      const filtered = products.filter((product) =>
+        product.name.toLowerCase().includes(search.toLowerCase())
+      );
+
+      navigate('/search', { state: { results: filtered, query: search } });
+
+    }
+
+  };
 
   return (
+
     <nav className="nav">
-      <Link to="/" className="nav-logo" onClick={() => setMenu('shop')}>
-        <img src={logo} alt="logo" />
-        <p>SwiftCart</p>
-      </Link>
 
-      <img
-        src={nav_dropdown}
-        alt="menu"
-        className="nav-dropdown"
-        onClick={dropdown_toggle}
-      />
+      {/* ===== TOP ROW ===== */}
+      <div className="nav-top">
 
-      <ul ref={menuRef} className="nav-menu">
-        {['shop', 'mens', 'womens', 'kids'].map((m) => (
-          <li key={m} onClick={() => setMenu(m)}>
-            <Link to={m === 'shop' ? '/' : `/${m}`} className={menu === m ? 'active' : ''}>
-              {m.charAt(0).toUpperCase() + m.slice(1)}
+        <Link to="/" className="nav-logo">
+          <img src={logo} alt="logo"/>
+          <p>SwiftCart</p>
+        </Link>
+
+        {/* SEARCH */}
+        <div className="nav-search">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e)=>setSearch(e.target.value)}
+            onKeyDown={handleSearch}
+          />
+        </div>
+
+        {/* BUTTONS */}
+        <div className="nav-login-cart">
+
+          <Link to="/myorders">
+            <button>My Orders</button>
+          </Link>
+
+          <Link to="/cart" className="cart-link">
+            <img src={cart_icon} alt="cart"/>
+            <div className="nav-cart-count">{getTotalCartItems()}</div>
+          </Link>
+
+          {localStorage.getItem("auth-token") ? (
+            <button
+              onClick={()=>{
+                localStorage.removeItem("auth-token");
+                navigate("/");
+              }}
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/login">
+              <button>Login</button>
             </Link>
-            <span className={`underline ${menu === m ? 'show' : ''}`} />
+          )}
+
+        </div>
+
+      </div>
+
+      {/* ===== SECOND ROW ===== */}
+      <ul ref={menuRef} className="nav-menu">
+        {["shop","mens","womens","kids"].map((m)=>(
+          <li key={m} onClick={()=>setMenu(m)}>
+            <Link
+              to={m==="shop"?"/":`/${m}`}
+              className={menu===m?"active":""}
+            >
+              {m.charAt(0).toUpperCase()+m.slice(1)}
+            </Link>
           </li>
         ))}
       </ul>
 
-      <div className="nav-login-cart">
-        {localStorage.getItem('auth-token') ? (
-          <button
-            onClick={() => {
-              localStorage.removeItem('auth-token');
-              window.location.replace('/');
-            }}
-          >
-            Logout
-          </button>
-        ) : (
-          <Link to="/login">
-            <button>Login</button>
-          </Link>
-        )}
-
-        <Link to="/myorders">
-          <div className="nav-orders">
-            📦 Orders
-          </div>
-        </Link>
-
-        <Link to="/cart" className="cart-link">
-          <img src={cart_icon} alt="cart" />
-          {cartCount > 0 && (
-            <span key={cartCount} className="nav-cart-count pulse">
-              {cartCount}
-            </span>
-          )}
-        </Link>
-      </div>
     </nav>
+
   );
+
 };
 
 export default Navbar;
