@@ -1,95 +1,73 @@
-import React, { useState } from 'react';
-import { FaLinkedin, FaInstagram, FaWhatsapp } from "react-icons/fa";
-import './Footer.css';
-import { useNotification } from '../../Context/NotificationContext';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import React from "react";
+import "./Footer.css";
+import { Link } from "react-router-dom";
+import { FaFacebookF, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
-  const { success } = useNotification();
-  const [ripple, setRipple] = useState(null);
-
-  const socials = [
-    { id: 'linkedin', icon: <FaLinkedin />, url: 'https://www.linkedin.com/in/owais-manzoor-989314261/' },
-    { id: 'instagram', icon: <FaInstagram />, url: 'https://instagram.com' },
-    { id: 'whatsapp', icon: <FaWhatsapp />, url: 'https://wa.me/91xxxxxxxxxx' },
-  ];
-
-  /* ✅ QUICK LINKS – WORKING ROUTES */
-  const quickLinks = [
-    { label: 'Shop', path: '/' },
-    { label: 'Men', path: '/mens' },
-    { label: 'Women', path: '/womens' },
-    { label: 'Kids', path: '/kids' },
-  ];
-
-  const handleSocial = (url, id) => {
-    setRipple(id);
-    setTimeout(() => setRipple(null), 600);
-    window.open(url, '_blank', 'noopener');
-    success('Opening link...');
-  };
-
   return (
-    <footer className="footer-new">
-      <div className="footer-glow" />
+    <footer className="footer">
 
-      <div className="footer-content">
-        {/* Brand */}
-        <motion.div
-          className="footer-brand"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: 'spring', stiffness: 300 }}
-        >
-          <div className="logo-circle">SC</div>
-          <div>
-            <h3>SwiftCart</h3>
-            <p>Fast fashion, faster delivery.</p>
+      <div className="footer-container">
+
+        {/* LEFT - BRAND */}
+        <div className="footer-col">
+          <h3>SwiftCart</h3>
+          <p>
+            India's fast-growing shopping platform delivering quality products
+            at the best price.
+          </p>
+
+          <div className="footer-social">
+            <a href="https://facebook.com" target="_blank" rel="noreferrer"><FaFacebookF /></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer"><FaInstagram /></a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer"><FaLinkedin /></a>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Quick Links */}
-        <div className="footer-links">
+        {/* QUICK LINKS */}
+        <div className="footer-col">
           <h4>Quick Links</h4>
           <ul>
-            {quickLinks.map((l) => (
-              <li key={l.label}>
-                <Link to={l.path}>{l.label}</Link>
-              </li>
-            ))}
+            <li><Link to="/">Shop</Link></li>
+            <li><Link to="/mens">Men</Link></li>
+            <li><Link to="/womens">Women</Link></li>
+            <li><Link to="/kids">Kids</Link></li>
+            <li><Link to="/cart">Cart</Link></li>
           </ul>
         </div>
 
-        {/* Social */}
-        <div className="footer-social">
-          <h4>Follow</h4>
-          <div className="social-icons">
-            {socials.map((s) => (
-              <motion.div
-                key={s.id}
-                className={`social-icon ${ripple === s.id ? 'ripple' : ''}`}
-                onClick={() => handleSocial(s.url, s.id)}
-                whileHover={{ scale: 1.2, rotate: -10 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <span>{s.icon}</span>
-              </motion.div>
-            ))}
-          </div>
+        {/* SERVICES */}
+        <div className="footer-col">
+          <h4>Our Services</h4>
+          <ul>
+            <li><Link to="/">Fast Delivery</Link></li>
+            <li><Link to="/">Easy Returns</Link></li>
+            <li><Link to="/">Secure Payment</Link></li>
+            <li><Link to="/">24/7 Support</Link></li>
+            <li><Link to="/">Best Deals</Link></li>
+          </ul>
+        </div>
+
+        {/* CONTACT */}
+        <div className="footer-col">
+          <h4>Contact Us</h4>
+          <p>📞 +91 9103236571</p>
+          <p>📧 support@swiftcart.com</p>
+          <p>📍 kashmir, India</p>
+        </div>
+
+      </div>
+
+      {/* BOTTOM BAR */}
+      <div className="footer-bottom">
+        <p>© 2026 SwiftCart. All rights reserved.</p>
+        <div className="footer-bottom-links">
+          <Link to="/">Privacy Policy</Link>
+          <Link to="/">Terms</Link>
+          <Link to="/">Sitemap</Link>
         </div>
       </div>
 
-      {/* Copyright */}
-      <motion.div
-        className="footer-copyright"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        <hr />
-        <p className="owais-line">Developed by OWAIS</p>
-        <p>9103236571</p>
-      </motion.div>
     </footer>
   );
 };

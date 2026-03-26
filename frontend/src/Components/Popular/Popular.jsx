@@ -1,54 +1,75 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import './Popular.css';
 import Item from '../Item/Item';
 import { motion } from 'framer-motion';
 
 const Popular = (props) => {
-  const hasData = props.data && props.data.length;
+  const scrollRef = useRef();
+
+  // 🔥 AUTO SLIDE
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollLeft += 250;
+
+        // reset when end reached
+        if (
+          scrollRef.current.scrollLeft + scrollRef.current.clientWidth >=
+          scrollRef.current.scrollWidth
+        ) {
+          scrollRef.current.scrollLeft = 0;
+        }
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // 👉 manual arrows
+  const scrollLeft = () => {
+    scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+  };
+
+  const scrollRight = () => {
+    scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+  };
 
   return (
     <div className="popular">
+
       <motion.h1
-        initial={{ scale: 0.9 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.4 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
       >
-        POPULAR IN WOMEN
+        Trending Women’s Wear 🔥
       </motion.h1>
+
+      <p className="sub-text">Discover trending fashion collections</p>
       <hr />
 
-      {hasData ? (
-        <div className="popular-item horizontal-row">
+      <div className="popular-wrapper">
+
+        {/* LEFT BUTTON */}
+        <button className="scroll-btn left" onClick={scrollLeft}>❮</button>
+
+        <div ref={scrollRef} className="popular-item horizontal-row">
           {props.data.map((item) => (
             <motion.div
               key={item._id}
               className="card-wrapper"
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.05 }}
             >
-              <Item
-                _id={item._id}
-                name={item.name}
-                image={item.image}
-                new_price={item.new_price}
-                old_price={item.old_price}
-              />
+              <Item {...item} />
             </motion.div>
           ))}
         </div>
-      ) : (
-        <SkeletonRow />
-      )}
+
+        {/* RIGHT BUTTON */}
+        <button className="scroll-btn right" onClick={scrollRight}>❯</button>
+
+      </div>
     </div>
   );
 };
-
-/* skeleton until data loads */
-const SkeletonRow = () => (
-  <div className="popular-item horizontal-row skeleton-row">
-    {Array.from({ length: 5 }).map((_, i) => (
-      <div className="skeleton-card" key={i} />
-    ))}
-  </div>
-);
 
 export default Popular;

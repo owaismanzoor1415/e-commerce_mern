@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Hero from '../Components/Hero/Hero';
 import Popular from '../Components/Popular/Popular';
 import NewCollections from '../Components/NewCollections/NewCollections';
-import NewsLetter from '../Components/NewsLetter/NewsLetter';
+import Subscribe from '../Components/Subscribe/Subscribe';
 import { backend_url } from '../App';
 import { motion } from 'framer-motion';
 
@@ -78,7 +78,7 @@ const Shop = () => {
         variants={sectionVariants}
         transition={{ delay: 0.45 }}
       >
-        <NewsLetter />
+        <Subscribe />
       </motion.div>
 
       <style jsx global>{`

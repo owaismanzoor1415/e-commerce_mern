@@ -21,7 +21,7 @@ const Navbar = () => {
 
     const path = location.pathname;
 
-    if (path === '/') setMenu('shop');
+    if (path === '/shop') setMenu('shop');
     else if (path === '/mens') setMenu('mens');
     else if (path === '/womens') setMenu('womens');
     else if (path === '/kids') setMenu('kids');

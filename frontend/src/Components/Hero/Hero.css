@@ -1,181 +1,137 @@
+/* ---------- HERO ---------- */
 .hero-new {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6rem 10vw;
-  min-height: 70vh;
-  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-  color: #fff;
-  overflow: hidden;
-}
-
-.hero-left-new {
-  flex: 1;
-  z-index: 2;
-}
-
-.glitch {
-  font-size: 3.5rem;
-  font-weight: 900;
-  text-transform: uppercase;
   position: relative;
-  color: #fff;
-  letter-spacing: 2px;
-  animation: glitch-skew 1s infinite linear alternate-reverse;
-}
-
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
-}
+  height: 85vh;
 
-.glitch::before {
-  animation: glitch-anim 0.3s infinite;
-  color: #ff4141;
-  z-index: -1;
-}
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
-.glitch::after {
-  animation: glitch-anim 0.3s infinite 0.1s;
-  color: #4141ff;
-  z-index: -2;
-}
+  transition: background-image 1s ease-in-out;
+  animation: zoomEffect 8s ease-in-out infinite;
 
-@keyframes glitch-anim {
-  0% { clip-path: inset(20% 0 60% 0); }
-  20% { clip-path: inset(90% 0 5% 0); }
-  40% { clip-path: inset(45% 0 40% 0); }
-  60% { clip-path: inset(70% 0 15% 0); }
-  80% { clip-path: inset(10% 0 80% 0); }
-  100% { clip-path: inset(50% 0 30% 0); }
-}
-
-@keyframes glitch-skew {
-  0% { transform: skew(0deg); }
-  10% { transform: skew(-2deg); }
-  20% { transform: skew(0deg); }
-  30% { transform: skew(1deg); }
-  40% { transform: skew(0deg); }
-  50% { transform: skew(-1deg); }
-  60% { transform: skew(0deg); }
-  70% { transform: skew(2deg); }
-  80% { transform: skew(0deg); }
-  90% { transform: skew(-1deg); }
-  100% { transform: skew(0deg); }
-}
-
-.sub {
-  margin: 1rem 0 2rem;
-  font-size: 1.2rem;
-  opacity: 0.8;
-}
-
-.shop-now {
-  position: relative;
-  padding: 1rem 2.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(45deg, #ff4141, #ff9141);
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
+  border-radius: 0;
   overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.shop-now:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(255, 65, 65, 0.35);
+/* 🔥 PREMIUM OVERLAY */
+.hero-new::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.7),
+    rgba(0,0,0,0.3),
+    rgba(0,0,0,0.7)
+  );
 }
 
-.shop-now span {
-  position: relative;
-  z-index: 2;
-}
-
-.shop-now.ripple::after {
-  content: '';
+/* ---------- TEXT ---------- */
+.hero-content {
   position: absolute;
   top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  transform: translate(-50%, -50%);
-  animation: ripple-effect 0.6s ease-out;
+  left: 8%;
+  transform: translateY(-50%);
+  z-index: 2;
+  color: white;
+  max-width: 500px;
 }
 
-@keyframes ripple-effect {
-  to {
-    width: 300px;
-    height: 300px;
-    opacity: 0;
-  }
+.hero-content h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 10px;
 }
 
-/* floating cards */
-.hero-right-new {
-  position: relative;
-  width: 420px;
-  height: 420px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  opacity: 0.9;
 }
 
-.float-card {
+/* ---------- BUTTON ---------- */
+.hero-btn {
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: none;
+  background: linear-gradient(45deg, #2563eb, #a855f7);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.hero-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* ---------- ARROWS ---------- */
+.slider-arrow {
   position: absolute;
-  width: 120px;
-  height: 160px;
-  background: var(--color);
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #fff;
-  box-shadow: 0 10px 30px -10px var(--color);
-  animation: float 4s ease-in-out infinite;
-  animation-delay: var(--delay);
-  transition: transform 0.3s;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 2;
 }
 
-.float-card:nth-child(1) { top: 0; left: 0; }
-.float-card:nth-child(2) { top: 0; right: 0; }
-.float-card:nth-child(3) { bottom: 0; left: 0; }
-.float-card:nth-child(4) { bottom: 0; right: 0; }
+.slider-arrow.left { left: 15px; }
+.slider-arrow.right { right: 15px; }
 
-.float-card:hover {
-  transform: translateY(-10px) rotateZ(-5deg);
+/* ---------- DOTS ---------- */
+.slider-dots {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 2;
 }
 
-@keyframes float {
-  0%   { transform: translateY(0px); }
-  50%  { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+.slider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #bbb;
+  cursor: pointer;
 }
 
-@media (max-width:768px){
-.hero-new{
-flex-direction:column;
-text-align:center;
-gap:3rem;
+.slider-dot.active {
+  background: rgba(255, 255, 255, 0.274);
+  transform: scale(1.2);
 }
 
-.glitch{
-font-size:2.5rem;
+/* ---------- ZOOM ANIMATION ---------- */
+@keyframes zoomEffect {
+  0% { background-size: 100%; }
+  50% { background-size: 110%; }
+  100% { background-size: 100%; }
 }
 
-.float-card{
-width:90px;
-height:120px;
-font-size:0.9rem;
-}
+/* ---------- MOBILE ---------- */
+@media (max-width: 768px) {
+
+  .hero-new {
+    height: 40vh;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-content p {
+    font-size: 0.9rem;
+  }
+
+  .hero-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
 }

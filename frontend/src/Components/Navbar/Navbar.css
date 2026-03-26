@@ -1,5 +1,11 @@
 :root {
-  --accent: #ff4141;
+  --accent: #2563eb; /* blue */
+}
+
+/* ---------- RESET (🔥 FIX GAP) ---------- */
+body {
+  margin: 0;
+  padding: 0;
 }
 
 /* ---------- NAVBAR CONTAINER ---------- */
@@ -7,55 +13,39 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: darkgrey;
 }
 
 /* ---------- TOP BAR ---------- */
-.nav-top{
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:10px 4vw;
-gap:20px;
-}
-
-.nav-search{
-flex:1;
-display:flex;
-justify-content:center;
-}
-
-.nav-search input{
-width:80%;
-padding:12px 20px;
-border-radius:30px;
-border:2px solid #ff4141;
-font-size:16px;
-outline:none;
+.nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  gap: 8px;
 }
 
 /* ---------- LOGO ---------- */
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 5px;
   text-decoration: none;
 }
 
 .nav-logo img {
-  height: 2.2rem;
+  height: 22px;
 }
 
 .nav-logo p {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #171717;
 }
 
-/* ---------- SEARCH BAR ---------- */
+/* ---------- SEARCH ---------- */
 .nav-search {
   flex: 1;
   display: flex;
@@ -63,213 +53,145 @@ outline:none;
 }
 
 .nav-search input {
-  width: 70%;
-  padding: 12px 20px;
-  border-radius: 30px;
-  border: 2px solid var(--accent);
-  outline: none;
-  font-size: 16px;
-  transition: 0.3s;
-}
-
-.nav-search input:focus {
-  box-shadow: 0 0 10px rgba(255, 65, 65, 0.4);
-}
-
-/* ---------- MENU BELOW SWIFTCART ---------- */
-
-.nav-menu {
-  display: flex;
-  justify-content: flex-start;   /* align left instead of center */
-  align-items: center;
-  gap: 2.5rem;
-
-  list-style: none;
-  margin: 0;
-
-  padding: 10px 4vw;   /* same padding as navbar */
-  border-top: 1px solid rgba(0,0,0,0.05);
-}
-
-.nav-menu li:hover .underline{
-width:100%;
-position: relative;
-}
-
-.nav-menu a {
-  text-decoration: none;
-  color: #171717;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.nav-menu a:hover,
-.nav-menu a.active {
-  color: var(--accent);
-}
-
-/* underline animation */
-
-.underline {
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--accent);
-  transition: width 0.3s ease;
-}
-
-.underline.show {
   width: 100%;
+  max-width: 220px; /* 🔥 keeps layout tight */
+  padding: 6px 10px;
+  border-radius: 20px;
+  border: 2px solid var(--accent);
+  font-size: 13px;
+  outline: none;
 }
 
 /* ---------- LOGIN / CART ---------- */
 .nav-login-cart {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 6px;
 }
 
 .nav-login-cart button {
-  padding: 0.6rem 1.8rem;
+  padding: 4px 8px;
   border: 1px solid #7a7a7a;
-  border-radius: 2rem;
+  border-radius: 20px;
   background: #fff;
-  color: #515151;
-  font-size: 1rem;
-  font-weight: 500;
+  color: black;
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 
 .nav-login-cart button:hover {
   background: var(--accent);
   color: #fff;
-  border-color: var(--accent);
 }
 
+.nav-login-cart button:focus {
+  outline: none;
+  background: #fff;
+  color: black;
+}
+
+.nav-login-cart button:active {
+  background: #fff;
+  color: black;
+}
+
+/* ---------- CART ---------- */
 .cart-link {
   position: relative;
 }
 
 .cart-link img {
-  height: 1.6rem;
+  height: 16px;
 }
 
 .nav-cart-count {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 1.3rem;
-  height: 1.3rem;
+  top: -4px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ---------- CART PULSE ---------- */
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.25); }
-  100% { transform: scale(1); }
+/* ---------- MENU ---------- */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 6px 10px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
-.pulse {
-  animation: pulse 0.4s ease-out;
-}
-
-/* ---------- HAMBURGER ---------- */
-.nav-dropdown {
+.nav-menu::-webkit-scrollbar {
   display: none;
-  width: 2rem;
-  cursor: pointer;
-  margin-left: 10px;
 }
 
-/* ---------- TABLET ---------- */
-@media (max-width: 900px) {
+.nav-menu li {
+  flex: 0 0 auto;
+}
 
-  .nav-search input {
-    width: 90%;
-  }
+.nav-menu a {
+  font-size: 13px;
+  text-decoration: none;
+  color: #171717;
+  padding: 2px 4px;
+}
 
+.nav-menu a.active {
+  color: var(--accent);
+}
+
+/* ---------- REMOVE GAP BELOW NAVBAR ---------- */
+.nav + * {
+  margin-top: 0 !important;
 }
 
 /* ---------- MOBILE ---------- */
 @media (max-width: 768px) {
 
   .nav-top {
-    padding: 0.8rem 3vw;
+    gap: 5px;
   }
 
-  .nav-search {
-    display: none;
-  }
-
-@media(max-width:768px){
-
-  .nav-dropdown{
-  display:block;
-  cursor:pointer;
-  width:30px;
-  }
-
-  .nav-menu{
-  position:absolute;
-  top:70px;
-  left:0;
-  width:100%;
-  background:white;
-  flex-direction:column;
-  align-items:center;
-  gap:20px;
-  padding:20px 0;
-  display:none;
-  }
-
-  .nav-menu-visible{
-  display:flex;
-  }
-
-  }
-
-  .underline {
-    display: none;
+  .nav-search input {
+    max-width: 150px;
+    font-size: 12px;
   }
 
   .nav-login-cart button {
-    padding: 0.5rem 1.4rem;
-    font-size: 0.9rem;
+    font-size: 11px;
+    padding: 3px 6px;
   }
 
+  .nav-menu {
+    gap: 12px;
+  }
 }
 
 /* ---------- SMALL PHONES ---------- */
 @media (max-width: 500px) {
 
   .nav-logo p {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
   }
 
   .nav-logo img {
-    height: 1.8rem;
+    height: 20px;
   }
 
-  .cart-link img {
-    height: 1.4rem;
+  .nav-search input {
+    max-width: 120px;
   }
-
-  .nav-cart-count {
-    width: 1.1rem;
-    height: 1.1rem;
-    font-size: 0.7rem;
-  }
-
 }

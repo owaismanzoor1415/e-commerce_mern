@@ -4,61 +4,45 @@ import Item from '../Item/Item';
 import { motion } from 'framer-motion';
 
 const NewCollections = ({ data }) => {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.08 },
-    },
-  };
-
-  const itemAnim = {
-    hidden: { opacity: 0, y: 40 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-  };
 
   return (
-    <motion.div
-      className="new-collections-new"
-      initial="hidden"
-      animate="show"
-      variants={container}
-    >
+    <div className="new-collections-new">
+
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
       >
-        NEW COLLECTIONS
+        Fresh Drops ✨
       </motion.h1>
 
-      <motion.hr
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-      />
+      <p className="sub-text">Latest arrivals you can’t miss</p>
 
-      <motion.div className="collections" variants={container}>
+      <hr />
+
+      <div className="collections">
         {data.map((item) => (
           <motion.div
-            key={item._id}   // ✅ FIXED
+            key={item._id}
             className="collection-item-wrapper"
-            variants={itemAnim}
-            whileHover={{ y: -8, transition: { duration: 0.25 } }}
+            whileHover={{ scale: 1.03 }}
           >
-            <div className="sparkle-badge">✨</div>
+
+            {/* 🔥 BADGE */}
+            <span className="badge">NEW</span>
 
             <Item
-              _id={item._id}        // ✅ FIXED
+              _id={item._id}
               name={item.name}
               image={item.image}
               new_price={item.new_price}
               old_price={item.old_price}
             />
+
           </motion.div>
         ))}
-      </motion.div>
-    </motion.div>
+      </div>
+
+    </div>
   );
 };
 

@@ -1,196 +1,100 @@
-.footer-new {
-  position: relative;
-  padding: 3rem 10vw 1.5rem;
-  background: #0d1117;
+.footer {
+  background: #0b1a2d;
   color: #fff;
-  overflow: hidden;
+  padding: 3rem 8vw 1rem;
 }
 
-.footer-glow {
-  position: absolute;
-  top: -150px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.25) 0%, transparent 70%);
-  filter: blur(80px);
-  pointer-events: none;
-}
-
-.footer-content {
+/* layout */
+.footer-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 2rem;
-  margin-bottom: 2rem;
 }
 
-/* brand */
-.footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  cursor: pointer;
+/* columns */
+.footer-col h3,
+.footer-col h4 {
+  margin-bottom: 1rem;
 }
 
-.logo-circle {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, #00ffff, #a855f7);
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 255, 255, 0.4);
-}
-
-.footer-brand h3 {
-  margin: 0;
-  font-size: 1.4rem;
-}
-
-.footer-brand p {
-  margin: 0;
-  opacity: 0.7;
+.footer-col p {
   font-size: 0.9rem;
+  color: #bbb;
+  line-height: 1.5;
 }
 
 /* links */
-.footer-links h4 {
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-
-.footer-links ul {
+.footer-col ul {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
-.footer-links li {
-  margin: 0.5rem 0;
-  position: relative;
+.footer-col ul li {
+  margin: 8px 0;
 }
 
-.footer-links a {
-  color: #ccc;
+.footer-col ul li a {
   text-decoration: none;
-  transition: color 0.3s;
+  color: #bbb;
+  transition: 0.3s;
 }
 
-.footer-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: #00ffff;
-  transition: width 0.3s;
-}
-
-.footer-links a:hover {
+.footer-col ul li a:hover {
   color: #fff;
-}
-
-.footer-links a:hover::after {
-  width: 100%;
+  padding-left: 5px;
 }
 
 /* social */
-.footer-social h4 {
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-
-.social-icons {
+.footer-social {
+  margin-top: 1rem;
   display: flex;
-  gap: 1rem;
+  gap: 10px;
 }
 
-.social-icon {
-  width: 44px;
-  height: 44px;
+.footer-social a {
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
+  background: #1e2a3a;
   display: grid;
   place-items: center;
-  cursor: pointer;
-  transition: background 0.3s;
-  position: relative;
-  overflow: hidden;
+  color: white;
+  transition: 0.3s;
 }
 
-.social-icon:hover {
-  background: rgba(255, 255, 255, 0.2);
+.footer-social a:hover {
+  background: #2563eb;
 }
 
-.social-icon span {
-  font-size: 1.4rem;
+/* bottom */
+.footer-bottom {
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
-.social-icon.ripple::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  transform: translate(-50%, -50%);
-  animation: ripple-effect 0.6s ease-out;
+.footer-bottom-links a {
+  margin-left: 15px;
+  color: #bbb;
+  text-decoration: none;
 }
 
-@keyframes ripple-effect {
-  to {
-    width: 120px;
-    height: 120px;
-    opacity: 0;
-  }
-}
-
-/* copyright – fade + glow pulse */
-.footer-copyright {
-  text-align: center;
-  font-size: 0.9rem;
-  opacity: 0.7;
-}
-
-.footer-copyright hr {
-  border: none;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.15);
-  margin: 0 0 1rem 0;
-}
-
-.owais-line {
-  display: inline-block;
-  animation: glow-pulse 2s infinite;
-}
-
-@keyframes glow-pulse {
-  0%,
-  100% {
-    text-shadow: 0 0 2px #00ffff, 0 0 4px #00ffff;
-  }
-  50% {
-    text-shadow: 0 0 6px #a855f7, 0 0 12px #a855f7;
-  }
+.footer-bottom-links a:hover {
+  color: #fff;
 }
 
 /* mobile */
-@media (max-width: 600px) {
-  .footer-content {
-    grid-template-columns: 1fr;
+@media (max-width: 768px) {
+  .footer-bottom {
+    flex-direction: column;
+    gap: 10px;
     text-align: center;
   }
-  .footer-brand {
-    justify-content: center;
-  }
-  .social-icons {
-    justify-content: center;
+
+  .footer-bottom-links a {
+    margin: 0 8px;
   }
 }
