@@ -16,7 +16,7 @@ const ShopContextProvider = (props) => {
 
   useEffect(() => {
 
-    fetch(`${backend_url}/allproducts`)
+    fetch(`${backend_url}/api/products/allproducts`)
       .then((res) => res.json())
       .then((data) => {
         if (data.products) setProducts(data.products);
