@@ -3,6 +3,7 @@ import Navbar from "./Components/Navbar/Navbar";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import Admin from "./Pages/Admin";
 import { ToastProvider } from "./Context/ToastContext";
+import './index.css';
 
 export const backend_url = process.env.REACT_APP_BACKEND_URL;
 export const currency = '₹';
@@ -11,19 +12,13 @@ function App() {
   return (
     <BrowserRouter>
       <ToastProvider>
-        <div className="flex min-h-screen bg-gray-50">
-          {/* Sidebar - Fixed Left */}
+        <div style={{ display:'flex', minHeight:'100vh', background:'var(--bg)' }}>
           <Sidebar />
-
-          {/* Main Content Area */}
-          <div className="flex-1 ml-64">
-            {/* Navbar - Fixed Top */}
+          <div style={{ flex:1, marginLeft:'var(--sidebar-w)', display:'flex', flexDirection:'column' }}>
             <Navbar />
-
-            {/* Page Content - Below Navbar */}
-            <div className="mt-16">
+            <main style={{ marginTop:'var(--navbar-h)', flex:1, overflowY:'auto' }}>
               <Admin />
-            </div>
+            </main>
           </div>
         </div>
       </ToastProvider>
@@ -32,4 +27,3 @@ function App() {
 }
 
 export default App;
-

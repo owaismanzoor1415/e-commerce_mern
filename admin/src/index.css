@@ -1,42 +1,62 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-@layer base {
-  body {
-    @apply m-0 bg-gray-50 min-h-screen;
-    font-family: 'Inter', 'Poppins', sans-serif;
-  }
+:root {
+  --bg:         #0a0a0a33;
+  --surface:    #111111;
+  --surface-2:  #1a1a1a;
+  --surface-3:  #222222;
+  --border:     rgba(255,255,255,0.07);
+  --border-hi:  rgba(255,255,255,0.14);
+  --text:       #f0ede8;
+  --text-muted: #6b6762;
+  --text-sub:   #9a9692;
+  --accent:     #c9a96e;
+  --accent-lt:  #e8d5b0;
+  --accent-dk:  #8a6f3e;
+  --danger:     #e05252;
+  --success:    #4caf7d;
+  --warning:    #e0a84a;
+  --info:       #5a9cf5;
+  --radius:     3px;
+  --radius-md:  6px;
+  --radius-lg:  10px;
+  --shadow:     0 8px 32px rgba(0,0,0,0.5);
+  --shadow-sm:  0 2px 12px rgba(0,0,0,0.35);
+  --font-d:     'Cormorant Garamond', serif;
+  --font-b:     'DM Sans', sans-serif;
+  --tr:         all 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+  --sidebar-w:  240px;
+  --navbar-h:   60px;
 }
 
-@layer components {
-  .card {
-    @apply bg-white rounded-lg shadow-sm p-6;
-  }
-
-  .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors;
-  }
-
-  .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors;
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-b);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: var(--font-b); }
+input, select, textarea { font-family: var(--font-b); }
 
-@layer utilities {
-  @keyframes slideIn {
-    from {
-      transform: translateX(400px);
-      opacity: 0;
-    }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dk); }
 
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+@keyframes spin     { to { transform: rotate(360deg); } }
+@keyframes pulse    { 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+@keyframes shimmer  { 0%{ background-position:-400px 0; } 100%{ background-position:400px 0; } }
 
-  .animate-slideIn {
-    animation: slideIn 0.3s ease-out;
-  }
-}
+.fade-up  { animation: fadeUp .35s ease forwards; }
+.fade-in  { animation: fadeIn .25s ease forwards; }
+.spinner  { animation: spin .7s linear infinite; }
+.pulsing  { animation: pulse 1.8s ease infinite; }

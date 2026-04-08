@@ -1,450 +1,270 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { backend_url } from '../../App';
+import { backend_url, currency } from '../../App';
+
+const sk = (w='100%', h=16, mb=0) => ({
+  width:w, height:h, borderRadius:2, marginBottom:mb,
+  background:'linear-gradient(90deg,var(--surface-2) 25%,var(--surface-3) 50%,var(--surface-2) 75%)',
+  backgroundSize:'400px 100%', animation:'shimmer 1.4s infinite',
+});
+
+const StatCard = ({ title, value, sub, icon, color, loading }) => (
+  <div style={{
+    background:'var(--surface)', border:'1px solid var(--border)',
+    borderRadius:'var(--radius-md)', padding:'22px 22px 18px',
+    position:'relative', overflow:'hidden', animation:'fadeUp .35s ease forwards',
+    transition:'var(--tr)',
+  }}
+  onMouseEnter={e=>e.currentTarget.style.borderColor='var(--border-hi)'}
+  onMouseLeave={e=>e.currentTarget.style.borderColor='var(--border)'}>
+    <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:color}} />
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+      <div style={{flex:1}}>
+        <p style={{fontSize:10,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--text-muted)',marginBottom:10}}>{title}</p>
+        {loading ? <div style={sk('60%',28,6)}/> : <h3 style={{fontSize:'1.6rem',fontWeight:500,color:'var(--text)',letterSpacing:'-0.01em'}}>{value}</h3>}
+        {loading ? <div style={sk('80%',12)}/> : <p style={{fontSize:11,color:'var(--text-muted)',marginTop:6}}>{sub}</p>}
+      </div>
+      <div style={{
+        width:40,height:40,borderRadius:'var(--radius)',
+        background:`rgba(${color==='#c9a96e'?'201,169,110':'76,175,125'}, 0.12)`,
+        display:'flex',alignItems:'center',justifyContent:'center',
+        fontSize:18,flexShrink:0,
+      }}>{icon}</div>
+    </div>
+  </div>
+);
 
 const Dashboard = () => {
-    const location = useLocation();
-    const [stats, setStats] = useState({
-        totalProducts: 0,
-        totalValue: 0,
-        totalDiscount: 0,
-        averagePrice: 0,
-        averageDiscount: 0,
-        highestPrice: 0,
-        lowestPrice: 0
-    });
+  const location = useLocation();
+  const [stats, setStats] = useState({ totalProducts:0, totalValue:0, totalDiscount:0, averagePrice:0, averageDiscount:0, highestPrice:0, lowestPrice:0 });
+  const [recentProducts, setRecentProducts] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [categoryData, setCategoryData] = useState({ women:0, men:0, kids:0 });
+  const [priceRanges, setPriceRanges] = useState({ low:0, medium:0, high:0, premium:0 });
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
-    const [recentProducts, setRecentProducts] = useState([]);
-    const [topProducts, setTopProducts] = useState([]);
-    const [categoryData, setCategoryData] = useState({ women: 0, men: 0, kids: 0 });
-    const [priceRanges, setPriceRanges] = useState({ low: 0, medium: 0, high: 0, premium: 0 });
-    const [loading, setLoading] = useState(true);
-    const [lastUpdated, setLastUpdated] = useState(new Date());
-    const [isRefreshing, setIsRefreshing] = useState(false);
+  const fetchData = async (silent=false) => {
+    try {
+      if (!silent) setLoading(true);
+      const res = await fetch(`${backend_url}/allproducts`);
+      const data = await res.json();
+      const products = data.products || data;
+      if (Array.isArray(products) && products.length > 0) {
+        const totalProducts = products.length;
+        const totalValue = products.reduce((s,p) => s+(p.new_price||0), 0);
+        const totalOldValue = products.reduce((s,p) => s+(p.old_price||0), 0);
+        const totalDiscount = totalOldValue - totalValue;
+        const averagePrice = Math.round(totalValue/totalProducts);
+        const discounts = products.map(p => p.old_price>p.new_price ? ((p.old_price-p.new_price)/p.old_price)*100 : 0);
+        const averageDiscount = Math.round(discounts.reduce((s,d)=>s+d,0)/totalProducts);
+        const prices = products.map(p=>p.new_price);
+        const highestPrice = Math.max(...prices);
+        const lowestPrice = Math.min(...prices);
+        const women = products.filter(p=>p.category?.toLowerCase()==='women').length;
+        const men   = products.filter(p=>p.category?.toLowerCase()==='men').length;
+        const kids  = products.filter(p=>p.category?.toLowerCase()==='kids'||p.category?.toLowerCase()==='kid').length;
+        const low     = products.filter(p=>p.new_price<1000).length;
+        const medium  = products.filter(p=>p.new_price>=1000&&p.new_price<2000).length;
+        const high    = products.filter(p=>p.new_price>=2000&&p.new_price<3000).length;
+        const premium = products.filter(p=>p.new_price>=3000).length;
+        const topDiscount = [...products].filter(p=>p.old_price>p.new_price)
+          .sort((a,b)=>((b.old_price-b.new_price)/b.old_price)-((a.old_price-a.new_price)/a.old_price)).slice(0,5);
+        setStats({ totalProducts, totalValue, totalDiscount, averagePrice, averageDiscount, highestPrice, lowestPrice });
+        setRecentProducts(products.slice(-6).reverse());
+        setTopProducts(topDiscount);
+        setCategoryData({ women, men, kids });
+        setPriceRanges({ low, medium, high, premium });
+        setLastUpdated(new Date());
+      }
+      setLoading(false);
+    } catch(e) { setLoading(false); }
+  };
 
-    // Auto-refresh every 30 seconds
-    useEffect(() => {
-        const interval = setInterval(() => {
-            fetchDashboardData(true); // Silent refresh
-        }, 30000); // 30 seconds
+  useEffect(() => { fetchData(); }, [location]);
+  useEffect(() => { const id = setInterval(()=>fetchData(true),30000); return ()=>clearInterval(id); }, []);
 
-        return () => clearInterval(interval);
-    }, []);
+  const total = stats.totalProducts || 1;
+  const catPct = (n) => ((n/total)*100).toFixed(1);
 
-    // Refresh when navigating back to dashboard
-    useEffect(() => {
-        fetchDashboardData();
-    }, [location]);
+  return (
+    <div style={{ padding:'28px 32px', minHeight:'100vh', background:'var(--bg)' }}>
 
-    const fetchDashboardData = async (silent = false) => {
-        try {
-            if (!silent) setLoading(true);
-            else setIsRefreshing(true);
-
-            const response = await fetch(`${backend_url}/allproducts`);
-            const data = await response.json();
-            const products = data.products || data;
-
-            if (Array.isArray(products) && products.length > 0) {
-
-                // Calculate REAL statistics
-                const totalProducts = products.length;
-                const totalValue = products.reduce((sum, p) => sum + (p.new_price || 0), 0);
-                const totalOldValue = products.reduce((sum, p) => sum + (p.old_price || 0), 0);
-                const totalDiscount = totalOldValue - totalValue;
-                const avgPrice = Math.round(totalValue / totalProducts);
-
-                // Calculate average discount percentage
-                const discounts = products.map(p => {
-                    if (p.old_price > p.new_price) {
-                        return ((p.old_price - p.new_price) / p.old_price) * 100;
-                    }
-                    return 0;
-                });
-                const avgDiscount = Math.round(discounts.reduce((sum, d) => sum + d, 0) / totalProducts);
-
-                // Find highest and lowest prices
-                const prices = products.map(p => p.new_price);
-                const highestPrice = Math.max(...prices);
-                const lowestPrice = Math.min(...prices);
-
-                // Category breakdown (REAL counts)
-                const women = products.filter(p => p.category.toLowerCase() === 'women').length;
-                const men = products.filter(p => p.category.toLowerCase() === 'men').length;
-                const kids = products.filter(p => p.category.toLowerCase() === 'kid').length;
-
-                // Price range distribution
-                const low = products.filter(p => p.new_price < 1000).length;
-                const medium = products.filter(p => p.new_price >= 1000 && p.new_price < 2000).length;
-                const high = products.filter(p => p.new_price >= 2000 && p.new_price < 3000).length;
-                const premium = products.filter(p => p.new_price >= 3000).length;
-
-                // Top products by discount percentage
-                const sortedByDiscount = [...products]
-                    .filter(p => p.old_price > p.new_price)
-                    .sort((a, b) => {
-                        const discountA = ((a.old_price - a.new_price) / a.old_price) * 100;
-                        const discountB = ((b.old_price - b.new_price) / b.old_price) * 100;
-                        return discountB - discountA;
-                    })
-                    .slice(0, 5);
-
-                setStats({
-                    totalProducts,
-                    totalValue,
-                    totalDiscount,
-                    averagePrice: avgPrice,
-                    averageDiscount: avgDiscount,
-                    highestPrice,
-                    lowestPrice
-                });
-
-                setRecentProducts(products.slice(-6).reverse());
-                setTopProducts(sortedByDiscount);
-                setCategoryData({ women, men, kids });
-                setPriceRanges({ low, medium, high, premium });
-                setLastUpdated(new Date());
-            } else {
-                // No products yet
-                setStats({
-                    totalProducts: 0,
-                    totalValue: 0,
-                    totalDiscount: 0,
-                    averagePrice: 0,
-                    averageDiscount: 0,
-                    highestPrice: 0,
-                    lowestPrice: 0
-                });
-                setRecentProducts([]);
-                setTopProducts([]);
-                setCategoryData({ women: 0, men: 0, kids: 0 });
-                setPriceRanges({ low: 0, medium: 0, high: 0, premium: 0 });
-            }
-
-            setLoading(false);
-            setIsRefreshing(false);
-        } catch (error) {
-            console.error('Error fetching dashboard data:', error);
-            setLoading(false);
-            setIsRefreshing(false);
-        }
-    };
-
-    const handleManualRefresh = () => {
-        fetchDashboardData();
-    };
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                    <p className="mt-4 text-gray-600 font-medium">Loading dashboard...</p>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="p-8 space-y-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-            {/* Header with Dynamic Refresh */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <div className="flex items-center gap-3">
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Live Dashboard
-                        </h1>
-                        {isRefreshing && (
-                            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-4 mt-2">
-                        <p className="text-gray-600 text-lg">
-                            Real-time data from your store
-                        </p>
-                        <div className="flex items-center gap-2 text-sm">
-                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            <span className="text-gray-500">
-                                Updated: {lastUpdated.toLocaleTimeString()}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={handleManualRefresh}
-                        className="px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:border-green-500 hover:text-green-600 transition-all flex items-center gap-2"
-                        disabled={isRefreshing}
-                    >
-                        <span className={isRefreshing ? 'animate-spin' : ''}>🔄</span>
-                        Refresh
-                    </button>
-                    <Link
-                        to="/addproduct"
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:shadow-2xl transition-all transform hover:-translate-y-1"
-                    >
-                        ➕ Add Product
-                    </Link>
-                    <Link
-                        to="/listproduct"
-                        className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:border-blue-500 hover:text-blue-600 transition-all"
-                    >
-                        📦 View All ({stats.totalProducts})
-                    </Link>
-                </div>
-            </div>
-
-            {/* Dynamic Stats with Animation */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    {
-                        title: 'Total Products',
-                        value: stats.totalProducts,
-                        icon: '📦',
-                        color: 'from-blue-500 via-blue-600 to-indigo-600',
-                        subtitle: 'Active inventory',
-                        trend: '+'
-                    },
-                    {
-                        title: 'Inventory Value',
-                        value: `₹${stats.totalValue.toLocaleString()}`,
-                        icon: '💰',
-                        color: 'from-green-500 via-green-600 to-emerald-600',
-                        subtitle: 'Total worth',
-                        trend: '↑'
-                    },
-                    {
-                        title: 'Avg Price',
-                        value: `₹${stats.averagePrice.toLocaleString()}`,
-                        icon: '💵',
-                        color: 'from-purple-500 via-purple-600 to-pink-600',
-                        subtitle: `${stats.averageDiscount}% avg discount`,
-                        trend: '~'
-                    },
-                    {
-                        title: 'Customer Savings',
-                        value: `₹${stats.totalDiscount.toLocaleString()}`,
-                        icon: '🎯',
-                        color: 'from-orange-500 via-orange-600 to-red-600',
-                        subtitle: 'Total discounts',
-                        trend: '↓'
-                    }
-                ].map((stat, index) => (
-                    <div key={index} className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1">
-                        <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-5 transition-opacity`}></div>
-                        <div className="p-6 relative">
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{stat.title}</p>
-                                    <h3 className="text-3xl font-bold text-gray-900 mt-3 transition-all duration-300">{stat.value}</h3>
-                                    <p className="text-xs text-gray-500 mt-2">{stat.subtitle}</p>
-                                    <div className="mt-3 flex items-center gap-2">
-                                        <span className="text-sm font-bold text-green-600">{stat.trend} Live</span>
-                                        <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
-                                    </div>
-                                </div>
-                                <div className={`bg-gradient-to-br ${stat.color} w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-xl transform group-hover:scale-110 group-hover:rotate-3 transition-all`}>
-                                    {stat.icon}
-                                </div>
-                            </div>
-                        </div>
-                        <div className={`h-1.5 bg-gradient-to-r ${stat.color}`}></div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Main Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Category Distribution - Dynamic */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Category Distribution</h2>
-                        <span className="text-xs text-gray-500 flex items-center gap-1">
-                            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                            Live Data
-                        </span>
-                    </div>
-                    <div className="space-y-6">
-                        {[
-                            { name: 'Women', count: categoryData.women, color: 'from-pink-500 to-rose-600', icon: '👗', bgColor: 'bg-pink-50' },
-                            { name: 'Men', count: categoryData.men, color: 'from-blue-500 to-cyan-600', icon: '👔', bgColor: 'bg-blue-50' },
-                            { name: 'Kids', count: categoryData.kids, color: 'from-yellow-500 to-orange-600', icon: '🧸', bgColor: 'bg-yellow-50' }
-                        ].map((cat, index) => {
-                            const total = stats.totalProducts;
-                            const percentage = total > 0 ? ((cat.count / total) * 100).toFixed(1) : 0;
-                            return (
-                                <div key={index} className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`${cat.bgColor} w-14 h-14 rounded-xl flex items-center justify-center text-2xl`}>
-                                                {cat.icon}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-gray-900 text-lg">{cat.name}</p>
-                                                <p className="text-sm text-gray-500">{percentage}% of total</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-3xl font-bold text-gray-900">{cat.count}</p>
-                                            <p className="text-xs text-gray-500">products</p>
-                                        </div>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                                        <div
-                                            className={`h-4 bg-gradient-to-r ${cat.color} rounded-full transition-all duration-1000 flex items-center justify-end pr-2`}
-                                            style={{ width: `${percentage}%` }}
-                                        >
-                                            {percentage > 10 && (
-                                                <span className="text-white text-xs font-bold">{percentage}%</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* Price Range Distribution - Dynamic */}
-                <div className="bg-white rounded-2xl shadow-lg p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Price Ranges</h2>
-                        <span className="text-xs text-gray-500">Auto-updating</span>
-                    </div>
-                    <div className="space-y-4">
-                        {[
-                            { label: 'Budget', range: '< ₹1K', count: priceRanges.low, color: 'bg-green-500', textColor: 'text-green-600' },
-                            { label: 'Medium', range: '₹1K-2K', count: priceRanges.medium, color: 'bg-blue-500', textColor: 'text-blue-600' },
-                            { label: 'High', range: '₹2K-3K', count: priceRanges.high, color: 'bg-purple-500', textColor: 'text-purple-600' },
-                            { label: 'Premium', range: '> ₹3K', count: priceRanges.premium, color: 'bg-orange-500', textColor: 'text-orange-600' }
-                        ].map((range, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                                <div>
-                                    <p className={`font-semibold ${range.textColor}`}>{range.label}</p>
-                                    <p className="text-xs text-gray-500">{range.range}</p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className={`${range.color} text-white px-4 py-2 rounded-lg font-bold transition-all duration-500`}>
-                                        {range.count}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Bottom Section - Dynamic */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Top Discounts - Updates Automatically */}
-                <div className="bg-white rounded-2xl shadow-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-gray-900">🏆 Best Deals</h2>
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Live</span>
-                    </div>
-                    {topProducts.length > 0 ? (
-                        <div className="space-y-3">
-                            {topProducts.map((product, index) => {
-                                const discount = Math.round(((product.old_price - product.new_price) / product.old_price) * 100);
-                                return (
-                                    <div key={index} className="flex items-center gap-3 p-3 bg-gradient-to-r from-gray-50 to-white rounded-xl hover:shadow-md transition-all border border-gray-100">
-                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-                                            #{index + 1}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-semibold text-gray-900 truncate text-sm">{product.name}</p>
-                                            <p className="text-xs text-green-600 font-bold">{discount}% OFF</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-bold text-gray-900">₹{product.new_price}</p>
-                                            <p className="text-xs text-gray-400 line-through">₹{product.old_price}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <p className="text-center text-gray-500 py-8">No discounted products</p>
-                    )}
-                </div>
-
-                {/* Recent Products - Auto Updates */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-gray-900">📦 Latest Products</h2>
-                        <div className="flex items-center gap-3">
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Refreshed {lastUpdated.toLocaleTimeString()}</span>
-                            <Link to="/listproduct" className="text-sm font-medium text-blue-600 hover:text-blue-700">
-                                View All →
-                            </Link>
-                        </div>
-                    </div>
-                    {recentProducts.length > 0 ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            {recentProducts.map((product, index) => (
-                                <div key={index} className="group cursor-pointer">
-                                    <div className="relative overflow-hidden rounded-xl bg-gray-100 aspect-square">
-                                        <img
-                                            src={product.image.startsWith('http') ? product.image : backend_url + product.image}
-                                            alt={product.name}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                            onError={(e) => { e.target.src = 'https://via.placeholder.com/200?text=Image'; }}
-                                        />
-                                        {product.old_price > product.new_price && (
-                                            <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
-                                                {Math.round(((product.old_price - product.new_price) / product.old_price) * 100)}% OFF
-                                            </div>
-                                        )}
-                                    </div>
-                                    <h3 className="mt-2 text-sm font-semibold text-gray-900 truncate">{product.name}</h3>
-                                    <div className="flex items-center justify-between mt-1">
-                                        <span className="text-sm font-bold text-gray-900">₹{product.new_price}</span>
-                                        {product.old_price > product.new_price && (
-                                            <span className="text-xs text-gray-500 line-through">₹{product.old_price}</span>
-                                        )}
-                                    </div>
-                                    <span className="text-xs text-gray-500 capitalize">{product.category}</span>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-8">
-                            <p className="text-gray-500 mb-3">No products yet</p>
-                            <Link to="/addproduct" className="text-blue-600 hover:text-blue-700 font-medium">
-                                Add your first product →
-                            </Link>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Price Stats Summary - Live */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold">💵 Live Pricing Stats</h2>
-                    <div className="flex items-center gap-2 bg-white bg-opacity-20 px-3 py-1 rounded-full">
-                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        <span className="text-sm">Auto-updating</span>
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[
-                        { label: 'Highest Price', value: stats.highestPrice },
-                        { label: 'Lowest Price', value: stats.lowestPrice },
-                        { label: 'Average Price', value: stats.averagePrice },
-                        { label: 'Avg Discount', value: `${stats.averageDiscount}%`, isPercent: true }
-                    ].map((item, index) => (
-                        <div key={index} className="text-center p-4 bg-white bg-opacity-10 rounded-xl backdrop-blur-sm">
-                            <p className="text-sm opacity-90">{item.label}</p>
-                            <p className="text-3xl font-bold mt-2 transition-all duration-500">
-                                {item.isPercent ? item.value : `₹${item.value.toLocaleString()}`}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            </div>
+      {/* Header */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:28 }}>
+        <div>
+          <p style={{ fontSize:11, letterSpacing:'0.22em', textTransform:'uppercase', color:'var(--accent)', marginBottom:6 }}>Overview</p>
+          <h1 style={{ fontFamily:'var(--font-d)', fontSize:'clamp(1.6rem,3vw,2.4rem)', fontWeight:300, color:'var(--text)', lineHeight:1.1 }}>
+            Live Dashboard
+          </h1>
+          <p style={{ fontSize:12, color:'var(--text-muted)', marginTop:6 }}>
+            <span style={{ display:'inline-flex', alignItems:'center', gap:5 }}>
+              <span style={{ width:6, height:6, borderRadius:'50%', background:'var(--success)', display:'inline-block', animation:'pulse 2s ease infinite' }} />
+              Updated {lastUpdated.toLocaleTimeString()}
+            </span>
+          </p>
         </div>
-    );
+        <div style={{ display:'flex', gap:10 }}>
+          <button onClick={()=>fetchData()} style={{ padding:'8px 16px', background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--radius)', color:'var(--text-muted)', fontSize:12, transition:'var(--tr)' }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor='var(--border-hi)'; e.currentTarget.style.color='var(--text)'; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.color='var(--text-muted)'; }}>
+            ↺ Refresh
+          </button>
+          <Link to="/addproduct" style={{ padding:'8px 20px', background:'var(--accent)', color:'#0a0a0a', borderRadius:'var(--radius)', fontSize:11, letterSpacing:'0.14em', textTransform:'uppercase', fontWeight:600, display:'inline-flex', alignItems:'center', transition:'var(--tr)' }}>
+            + Add Product
+          </Link>
+        </div>
+      </div>
+
+      {/* Stat Cards */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16, marginBottom:24 }}>
+        {[
+          { title:'Total Products', value: stats.totalProducts, sub:'Active inventory', icon:'◫', color:'#c9a96e' },
+          { title:'Inventory Value', value: `${currency}${stats.totalValue.toLocaleString()}`, sub:'Total catalogue worth', icon:'◈', color:'#4caf7d' },
+          { title:'Avg. Price', value: `${currency}${stats.averagePrice.toLocaleString()}`, sub:`${stats.averageDiscount}% avg discount`, icon:'◉', color:'#5a9cf5' },
+          { title:'Customer Savings', value: `${currency}${stats.totalDiscount.toLocaleString()}`, sub:'Total discount given', icon:'◎', color:'#e0a84a' },
+        ].map((s,i) => <StatCard key={i} {...s} loading={loading} />)}
+      </div>
+
+      {/* Middle row */}
+      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:16, marginBottom:24 }}>
+
+        {/* Category Distribution */}
+        <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--radius-md)', padding:24 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:22 }}>
+            <h2 style={{ fontFamily:'var(--font-d)', fontSize:'1.2rem', fontWeight:400, color:'var(--text)' }}>Category Distribution</h2>
+            <span style={{ fontSize:10, letterSpacing:'0.15em', textTransform:'uppercase', color:'var(--text-muted)' }}>Live</span>
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
+            {[
+              { name:'Women', count:categoryData.women, color:'#e8a0b4', barColor:'rgba(232,160,180,0.7)' },
+              { name:'Men',   count:categoryData.men,   color:'#5a9cf5', barColor:'rgba(90,156,245,0.7)' },
+              { name:'Kids',  count:categoryData.kids,  color:'#e0a84a', barColor:'rgba(224,168,74,0.7)' },
+            ].map((cat,i) => {
+              const pct = loading ? 0 : catPct(cat.count);
+              return (
+                <div key={i}>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
+                    <span style={{ fontSize:13, color:'var(--text)' }}>{cat.name}</span>
+                    <span style={{ fontSize:12, color:'var(--text-muted)' }}>{loading ? '—' : `${cat.count} items · ${pct}%`}</span>
+                  </div>
+                  <div style={{ height:6, background:'var(--surface-3)', borderRadius:3, overflow:'hidden' }}>
+                    <div style={{ height:'100%', width:`${pct}%`, background:cat.barColor, borderRadius:3, transition:'width 1s ease' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Price Ranges */}
+        <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--radius-md)', padding:24 }}>
+          <h2 style={{ fontFamily:'var(--font-d)', fontSize:'1.2rem', fontWeight:400, color:'var(--text)', marginBottom:18 }}>Price Ranges</h2>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {[
+              { label:'Budget',  range:'< ₹1K',    count:priceRanges.low,     color:'var(--success)' },
+              { label:'Mid',     range:'₹1K–2K',   count:priceRanges.medium,  color:'var(--info)' },
+              { label:'High',    range:'₹2K–3K',   count:priceRanges.high,    color:'var(--accent)' },
+              { label:'Premium', range:'> ₹3K',    count:priceRanges.premium, color:'var(--warning)' },
+            ].map((r,i) => (
+              <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 12px', background:'var(--surface-2)', borderRadius:'var(--radius)', border:'1px solid var(--border)' }}>
+                <div>
+                  <p style={{ fontSize:12, fontWeight:500, color:r.color }}>{r.label}</p>
+                  <p style={{ fontSize:11, color:'var(--text-muted)' }}>{r.range}</p>
+                </div>
+                <span style={{ fontSize:'1.1rem', fontWeight:500, color:'var(--text)' }}>{loading ? '—' : r.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom row */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:16 }}>
+
+        {/* Best Deals */}
+        <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--radius-md)', padding:24 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:18 }}>
+            <h2 style={{ fontFamily:'var(--font-d)', fontSize:'1.2rem', fontWeight:400, color:'var(--text)' }}>Best Deals</h2>
+            <span style={{ fontSize:10, color:'var(--success)', letterSpacing:'0.12em', textTransform:'uppercase' }}>● Live</span>
+          </div>
+          {!loading && topProducts.length > 0 ? topProducts.map((p,i) => {
+            const disc = Math.round(((p.old_price-p.new_price)/p.old_price)*100);
+            return (
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 0', borderBottom:'1px solid var(--border)' }}>
+                <span style={{ fontSize:11, color:'var(--text-muted)', width:16, textAlign:'right' }}>#{i+1}</span>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <p style={{ fontSize:12, color:'var(--text)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{p.name}</p>
+                  <p style={{ fontSize:11, color:'var(--success)' }}>{disc}% off</p>
+                </div>
+                <div style={{ textAlign:'right', flexShrink:0 }}>
+                  <p style={{ fontSize:12, color:'var(--accent)' }}>{currency}{p.new_price}</p>
+                  <p style={{ fontSize:11, color:'var(--text-muted)', textDecoration:'line-through' }}>{currency}{p.old_price}</p>
+                </div>
+              </div>
+            );
+          }) : (
+            <p style={{ fontSize:13, color:'var(--text-muted)', textAlign:'center', padding:'20px 0' }}>No discounted products yet</p>
+          )}
+        </div>
+
+        {/* Recent Products */}
+        <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--radius-md)', padding:24 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:18 }}>
+            <h2 style={{ fontFamily:'var(--font-d)', fontSize:'1.2rem', fontWeight:400, color:'var(--text)' }}>Latest Products</h2>
+            <Link to="/listproduct" style={{ fontSize:11, color:'var(--accent)', letterSpacing:'0.1em', textTransform:'uppercase' }}>View All →</Link>
+          </div>
+          {loading ? (
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
+              {[...Array(6)].map((_,i)=><div key={i} style={sk('100%',120)} />)}
+            </div>
+          ) : recentProducts.length > 0 ? (
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
+              {recentProducts.map((p,i)=>{
+                const disc = p.old_price>p.new_price ? Math.round(((p.old_price-p.new_price)/p.old_price)*100) : 0;
+                const src = p.image?.startsWith('http') ? p.image : backend_url+p.image;
+                return (
+                  <div key={i} style={{ cursor:'pointer' }}
+                    onMouseEnter={e=>e.currentTarget.querySelector('img').style.transform='scale(1.06)'}
+                    onMouseLeave={e=>e.currentTarget.querySelector('img').style.transform='scale(1)'}>
+                    <div style={{ position:'relative', overflow:'hidden', borderRadius:'var(--radius)', background:'var(--surface-2)', aspectRatio:'1', marginBottom:8 }}>
+                      <img src={src} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'cover', transition:'transform .5s ease' }} onError={e=>e.target.style.display='none'} />
+                      {disc>0 && <span style={{ position:'absolute', top:6, right:6, background:'var(--success)', color:'#0a0a0a', fontSize:9, fontWeight:700, padding:'2px 6px', borderRadius:2 }}>{disc}%</span>}
+                    </div>
+                    <p style={{ fontSize:12, color:'var(--text)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', marginBottom:3 }}>{p.name}</p>
+                    <div style={{ display:'flex', gap:6, alignItems:'center' }}>
+                      <span style={{ fontSize:12, color:'var(--accent)', fontWeight:500 }}>{currency}{p.new_price}</span>
+                      {disc>0 && <span style={{ fontSize:11, color:'var(--text-muted)', textDecoration:'line-through' }}>{currency}{p.old_price}</span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ textAlign:'center', padding:'30px 0' }}>
+              <p style={{ color:'var(--text-muted)', fontSize:13, marginBottom:12 }}>No products yet</p>
+              <Link to="/addproduct" style={{ fontSize:12, color:'var(--accent)' }}>Add your first product →</Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pricing stats footer bar */}
+      <div style={{ marginTop:16, background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'var(--radius-md)', padding:'18px 24px', display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, borderTop:'2px solid var(--accent-dk)' }}>
+        {[
+          { label:'Highest Price', value:`${currency}${stats.highestPrice.toLocaleString()}` },
+          { label:'Lowest Price',  value:`${currency}${stats.lowestPrice.toLocaleString()}` },
+          { label:'Avg. Price',    value:`${currency}${stats.averagePrice.toLocaleString()}` },
+          { label:'Avg. Discount', value:`${stats.averageDiscount}%` },
+        ].map((s,i)=>(
+          <div key={i} style={{ textAlign:'center' }}>
+            <p style={{ fontSize:10, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--text-muted)', marginBottom:6 }}>{s.label}</p>
+            {loading ? <div style={sk('60%',22)} /> : <p style={{ fontSize:'1.3rem', fontWeight:500, color:'var(--text)' }}>{s.value}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;

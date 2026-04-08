@@ -20,37 +20,32 @@ import Search from './Pages/Search';
 export const backend_url = process.env.REACT_APP_BACKEND_URL;
 export const currency = '₹';
 
-/* ----------  Animated Page Wrapper  ---------- */
 const AnimatedPage = ({ children }) => (
   <motion.div
     key={window.location.pathname}
-    initial={{ opacity: 0, y: 20 }}
+    initial={{ opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -20 }}
-    transition={{ duration: 0.35, ease: "easeInOut" }}
+    exit={{ opacity: 0, y: -16 }}
+    transition={{ duration: 0.3, ease: "easeInOut" }}
   >
     {children}
   </motion.div>
 );
 
-/* ----------  Scroll-To-Top Helper  ---------- */
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => window.scrollTo(0, 0), [pathname]);
   return null;
 };
 
-/* ----------  Loading Bar  ---------- */
 const PageLoader = () => {
   const [loading, setLoading] = useState(false);
   const { pathname } = useLocation();
-
   useEffect(() => {
     setLoading(true);
     const id = setTimeout(() => setLoading(false), 400);
     return () => clearTimeout(id);
   }, [pathname]);
-
   return (
     <motion.div
       className="global-loader"
@@ -62,7 +57,6 @@ const PageLoader = () => {
   );
 };
 
-/* ----------  Main App  ---------- */
 function App() {
   const location = useLocation();
   return (
@@ -80,43 +74,17 @@ function App() {
           <Route path="/checkout" element={<AnimatedPage><Checkout /></AnimatedPage>} />
           <Route path="/verify" element={<AnimatedPage><Verify /></AnimatedPage>} />
           <Route path="/cart" element={<AnimatedPage><Cart /></AnimatedPage>} />
-          <Route path="/myorders" element={<MyOrders/>}/>
+          <Route path="/myorders" element={<MyOrders />} />
           <Route path="/login" element={<AnimatedPage><LoginSignup /></AnimatedPage>} />
           <Route path="/description" element={<DescriptionBox />} />
           <Route path="/search" element={<Search />} />
         </Routes>
       </AnimatePresence>
       <Footer />
-      <style jsx global>{`
-        /* ---- mini design-tokens ---- */
-        :root {
-          --accent: #ff4141;
-          --bg: #fefefe;
-          --text: #222;
-          --radius: 12px;
-          --shadow: 0 8px 20px -6px rgba(0,0,0,.15);
-          --font: "Inter", system-ui, sans-serif;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-          font-family: var(--font);
-          background: var(--bg);
-          color: var(--text);
-          scroll-behavior: smooth;
-        }
-        .global-loader {
-          position: fixed;
-          top: 0; left: 0; right: 0; height: 3px;
-          background: var(--accent);
-          transform-origin: left;
-          z-index: 9999;
-        }
-      `}</style>
     </>
   );
 }
 
-/* ----------  Router Wrapper  ---------- */
 export default function Root() {
   return (
     <Router>

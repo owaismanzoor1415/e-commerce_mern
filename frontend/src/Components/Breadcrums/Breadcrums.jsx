@@ -1,20 +1,17 @@
 import React from 'react';
 import './Breadcrums.css';
-import arrow_icon from '../Assets/breadcrum_arrow.png';
 import { Link } from 'react-router-dom';
 
-const Breadcrums = ({ product }) => {
-  return (
-    <nav className="breadcrums-max">
-      <Link to="/" className="crumb">HOME</Link>
-      <img src={arrow_icon} className="arrow" alt=">" />
-      <Link to="/shop" className="crumb">SHOP</Link>
-      <img src={arrow_icon} className="arrow" alt=">" />
-      <Link to={`/${product.category}`} className="crumb">{product.category}</Link>
-      <img src={arrow_icon} className="arrow" alt=">" />
-      <span className="crumb current">{product.name}</span>
-    </nav>
-  );
-};
+const Breadcrums = ({ product }) => (
+  <nav className="breadcrumb" aria-label="Breadcrumb">
+    <ol className="breadcrumb-list">
+      <li><Link to="/">Home</Link></li>
+      <li className="breadcrumb-sep">›</li>
+      <li><Link to={`/${product?.category}`}>{product?.category}</Link></li>
+      <li className="breadcrumb-sep">›</li>
+      <li className="active">{product?.name}</li>
+    </ol>
+  </nav>
+);
 
 export default Breadcrums;
