@@ -19,8 +19,7 @@ const ShopContextProvider = (props) => {
     fetch(`${backend_url}/api/products/allproducts`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.products) setProducts(data.products);
-        else if (Array.isArray(data)) setProducts(data);
+        setProducts(data.products || data || []);
       })
       .catch((err) => console.error("Failed to fetch products:", err));
 
@@ -33,7 +32,7 @@ const ShopContextProvider = (props) => {
 
     if (!localStorage.getItem("auth-token")) return;
 
-    fetch(`${backend_url}/getcart`, {
+    fetch(`${backend_url}/api/cart/getcart`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -138,7 +137,7 @@ const ShopContextProvider = (props) => {
 
     if (!silent) success(`${product.name} added to cart!`);
 
-    fetch(`${backend_url}/addtocart`, {
+    fetch(`${backend_url}/api/cart/addtocart`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -180,7 +179,7 @@ const ShopContextProvider = (props) => {
 
     if (product) info(`${product.name} removed from cart!`);
 
-    fetch(`${backend_url}/removefromcart`, {
+    fetch(`${backend_url}/api/cart/removefromcart`, {
       method: "POST",
       headers: {
         Accept: "application/json",

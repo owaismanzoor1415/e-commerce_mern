@@ -11,17 +11,16 @@ const Shop = () => {
   const [newcollection, setNewCollection] = useState([]);
 
   const fetchInfo = () => {
-    fetch(`${backend_url}/popularinwomen`)
+    fetch(`${backend_url}/api/products/popularinwomen`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.products) setPopular(data.products);
-        else if (Array.isArray(data)) setPopular(data);
+        setPopular(data.products || data || []);
       });
-    fetch(`${backend_url}/newcollections`)
+
+    fetch(`${backend_url}/api/products/newcollections`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.products) setNewCollection(data.products);
-        else if (Array.isArray(data)) setNewCollection(data);
+        setNewCollection(data.products || data || []);
       });
   };
 
@@ -51,7 +50,6 @@ const Shop = () => {
         variants={sectionVariants}
         transition={{ delay: 0.15 }}
       >
-        {/* Skeleton fallback until data arrives */}
         {popular.length ? (
           <Popular data={popular} />
         ) : (
@@ -88,7 +86,6 @@ const Shop = () => {
           --shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.15);
           font-family: "Inter", system-ui, sans-serif;
         }
-        /* Skeleton card grid */
         .skeleton-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -106,7 +103,6 @@ const Shop = () => {
           50%  { opacity: 0.5; }
           100% { opacity: 1; }
         }
-        /* Lift on hover for every product card */
         .product-item:hover {
           transform: translateY(-6px);
           box-shadow: var(--shadow);
@@ -117,7 +113,6 @@ const Shop = () => {
   );
 };
 
-/* Simple skeleton until data loads */
 const SkeletonGrid = () => (
   <div className="skeleton-grid">
     {Array.from({ length: 8 }).map((_, i) => (
