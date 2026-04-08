@@ -10,6 +10,7 @@ const {
 } = require("../controllers/productController");
 
 // Public routes
+router.get("/", getAllProducts);
 router.get("/allproducts", getAllProducts);
 router.get("/newcollections", getNewCollections);
 router.get("/popularinwomen", getPopularInWomen);
