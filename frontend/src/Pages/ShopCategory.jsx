@@ -6,17 +6,20 @@ import { backend_url } from "../App";
 
 const categoryLabels = { men: "Men's Collection", women: "Women's Collection", kids: "Kids' Collection" };
 const categoryBanners = {
-  men: "https://plus.unsplash.com/premium_photo-1661436770201-31243a668d1f?q=80&w=1600&auto=format&fit=crop",
-  women: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80",
-  kids: "https://images.unsplash.com/photo-1711086340856-73591afb5d39?q=80&w=1600&auto=format&fit=crop"
+  men: "https://plus.unsplash.com/premium_photo-1661436770201-31243a668d1f?q=80&w=1600&auto=format&fit=crop ",
+  women: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80 ",
+  kids: "https://images.unsplash.com/photo-1711086340856-73591afb5d39?q=80&w=1600&auto=format&fit=crop "
 };
 
 const ShopCategory = (props) => {
   const [allProducts, setAllProducts] = useState([]);
   const cat = String(props.category || "").toLowerCase().trim();
+  
+  // Fix trailing slash issue
+  const baseUrl = backend_url ? backend_url.replace(/\/$/, '') : '';
 
   useEffect(() => {
-    fetch(`${backend_url}/allproducts`)
+    fetch(`${baseUrl}/allproducts`)
       .then(res => res.json())
       .then(data => {
         if (data.products) setAllProducts(data.products);

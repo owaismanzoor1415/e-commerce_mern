@@ -9,15 +9,18 @@ import { motion } from 'framer-motion';
 const Shop = () => {
   const [popular, setPopular] = useState([]);
   const [newcollection, setNewCollection] = useState([]);
+  
+  // Fix trailing slash issue
+  const baseUrl = backend_url ? backend_url.replace(/\/$/, '') : '';
 
   const fetchInfo = () => {
-    fetch(`${backend_url}/popularinwomen`)
+    fetch(`${baseUrl}/popularinwomen`)
       .then((res) => res.json())
       .then((data) => {
         setPopular(data.products || data || []);
       });
 
-    fetch(`${backend_url}/newcollections`)
+    fetch(`${baseUrl}/newcollections`)
       .then((res) => res.json())
       .then((data) => {
         setNewCollection(data.products || data || []);

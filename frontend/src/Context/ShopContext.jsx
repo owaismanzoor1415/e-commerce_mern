@@ -11,12 +11,15 @@ const ShopContextProvider = (props) => {
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [cartItemsV2, setCartItemsV2] = useState({});
+  
+  // Fix trailing slash issue
+  const baseUrl = backend_url ? backend_url.replace(/\/$/, '') : '';
 
   /* ================= FETCH PRODUCTS ================= */
 
   useEffect(() => {
 
-    fetch(`${backend_url}/allproducts`)
+    fetch(`${baseUrl}/allproducts`)
       .then((res) => res.json())
       .then((data) => {
         setProducts(data.products || data || []);
@@ -32,7 +35,7 @@ const ShopContextProvider = (props) => {
 
     if (!localStorage.getItem("auth-token")) return;
 
-    fetch(`${backend_url}/getcart`, {
+    fetch(`${baseUrl}/getcart`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -137,7 +140,7 @@ const ShopContextProvider = (props) => {
 
     if (!silent) success(`${product.name} added to cart!`);
 
-    fetch(`${backend_url}/addtocart`, {
+    fetch(`${baseUrl}/addtocart`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -179,7 +182,7 @@ const ShopContextProvider = (props) => {
 
     if (product) info(`${product.name} removed from cart!`);
 
-    fetch(`${backend_url}/removefromcart`, {
+    fetch(`${baseUrl}/removefromcart`, {
       method: "POST",
       headers: {
         Accept: "application/json",
