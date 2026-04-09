@@ -82,31 +82,6 @@
   pointer-events: none;
 }
 
-/* ─── BRANDMARK ─────────────────────────────────── */
-.hp-brandmark {
-  position: absolute;
-  top: 38px;
-  left: 52px;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.hp-brandmark-line {
-  width: 28px;
-  height: 1px;
-  background: rgba(22, 163, 74, 0.45);
-}
-
-.hp-brandmark-text {
-  font-size: 10px;
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: rgba(22, 163, 74, 0.45);
-}
-
 /* ─── COUNTER ───────────────────────────────────── */
 .hp-counter {
   position: absolute;
@@ -143,42 +118,6 @@
   height: 100%;
   background: #16a34a;
   transition: width 0.05s linear;
-}
-
-/* ─── DOT NAVIGATION ────────────────────────────── */
-.hp-dots {
-  position: absolute;
-  bottom: 38px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.hp-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(22, 101, 52, 0.25);
-  cursor: pointer;
-  padding: 0;
-  transition: background 0.3s, transform 0.3s, width 0.3s;
-  flex-shrink: 0;
-}
-
-.hp-dot-active {
-  background: #16a34a;
-  width: 22px;
-  border-radius: 3px;
-  transform: none;
-}
-
-.hp-dot:hover:not(.hp-dot-active) {
-  background: rgba(201, 169, 110, 0.5);
-  transform: scale(1.3);
 }
 
 /* ─── SINGLE THUMBNAIL — bottom right ──────────── */
@@ -274,19 +213,14 @@
   .hp-thumb {
     width: 110px;
     height: 90px;
-    right: 20px;
+    right: 30px;
     bottom: 70px;
   }
 
-  .hp-brandmark { left: 24px; top: 26px; }
   .hp-counter { right: 24px; top: 30px; }
-  .hp-dots { bottom: 28px; gap: 8px; }
 }
 
 @media (max-width: 480px) {
   .hp-root { height: 88vh; }
-  .hp-thumb { width: 90px; height: 80px; right: 14px; bottom: 60px; }
-  .hp-dots { gap: 6px; }
-  .hp-dot { width: 5px; height: 5px; }
-  .hp-dot-active { width: 16px; }
+  .hp-thumb { width: 90px; height: 80px; right: 30px; bottom:5px; }
 }

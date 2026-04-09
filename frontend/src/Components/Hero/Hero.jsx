@@ -2,51 +2,30 @@ import React, { useEffect, useState, useRef } from 'react';
 import './Hero.css';
 
 const slides = [
-  {
-    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?q=80&w=1800&auto=format&fit=crop",
-  },
+  { image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1800&auto=format&fit=crop" },
+  { image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1800&auto=format&fit=crop" },
+  { image: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=1800&auto=format&fit=crop" },
+  { image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=1800&auto=format&fit=crop" },
+  { image: "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?q=80&w=1800&auto=format&fit=crop" },
+  { image: "https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?q=80&w=1800&auto=format&fit=crop" },
+  { image: "https://images.unsplash.com/photo-1550614000-4895a10e1bfd?q=80&w=1800&auto=format&fit=crop" },
+  { image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1800&auto=format&fit=crop" },
 ];
 
 const DURATION = 5000;
 
 const Hero = () => {
-  const [index, setIndex] = useState(0);
-  const [prevIndex, setPrevIndex] = useState(null);
-  const [transitioning, setTransitioning] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [index, setIndex]           = useState(0);
+  const [prevIndex, setPrevIndex]   = useState(null);
+  const [progress, setProgress]     = useState(0);
 
-  const nextIndex = (index + 1) % slides.length;
+  // Refs so interval callbacks always read the freshest values
+  const indexRef = useRef(0);
+  const transRef = useRef(false);
+  const autoRef  = useRef(null);
+  const progRef  = useRef(null);
 
-  const autoRef = useRef(null);
-  const progRef = useRef(null);
-
+  // ── Progress bar ────────────────────────────────
   const startProgress = () => {
     setProgress(0);
     clearInterval(progRef.current);
@@ -58,36 +37,47 @@ const Hero = () => {
     }, 40);
   };
 
-  const goTo = (next) => {
-    if (next === index || transitioning) return;
-    setPrevIndex(index);
-    setTransitioning(true);
+  // ── Core advance (always reads from ref) ────────
+  const advance = (curr) => {
+    if (transRef.current) return;
+    const next = (curr + 1) % slides.length;
+    transRef.current = true;
+    setPrevIndex(curr);
     setIndex(next);
-    setTimeout(() => { setPrevIndex(null); setTransitioning(false); }, 1000);
-    clearInterval(autoRef.current);
+    indexRef.current = next;
+    setTimeout(() => {
+      setPrevIndex(null);
+      transRef.current = false;
+    }, 1000);
     startProgress();
-    autoRef.current = setInterval(() => tick(), DURATION);
   };
 
-  const tick = () => {
-    setIndex(curr => {
-      const next = (curr + 1) % slides.length;
-      setPrevIndex(curr);
-      setTransitioning(true);
-      setTimeout(() => { setPrevIndex(null); setTransitioning(false); }, 1000);
-      return next;
-    });
+  // ── Manual jump ─────────────────────────────────
+  const goTo = (next) => {
+    if (next === indexRef.current || transRef.current) return;
+    clearInterval(autoRef.current);
+    const curr = indexRef.current;
+    transRef.current = true;
+    setPrevIndex(curr);
+    setIndex(next);
+    indexRef.current = next;
+    setTimeout(() => {
+      setPrevIndex(null);
+      transRef.current = false;
+    }, 1000);
     startProgress();
+    autoRef.current = setInterval(() => advance(indexRef.current), DURATION);
   };
 
   useEffect(() => {
     startProgress();
-    autoRef.current = setInterval(tick, DURATION);
+    autoRef.current = setInterval(() => advance(indexRef.current), DURATION);
     return () => { clearInterval(autoRef.current); clearInterval(progRef.current); };
   }, []);
 
-  const slide = slides[index];
-  const prev = prevIndex !== null ? slides[prevIndex] : null;
+  const slide      = slides[index];
+  const prev       = prevIndex !== null ? slides[prevIndex] : null;
+  const nextIndex  = (index + 1) % slides.length;
   const thumbSlide = slides[nextIndex];
 
   return (
@@ -104,12 +94,6 @@ const Hero = () => {
       <div className="hp-overlay-left" />
       <div className="hp-noise" />
 
-      {/* Top-left brandmark */}
-      <div className="hp-brandmark">
-        <div className="hp-brandmark-line" />
-        <span className="hp-brandmark-text">Est. 2006</span>
-      </div>
-
       {/* Top-right counter */}
       <div className="hp-counter">
         <span className="hp-counter-idx">0{index + 1}</span>
@@ -119,25 +103,17 @@ const Hero = () => {
         <span className="hp-counter-total">{slides.length}</span>
       </div>
 
-      {/* Dot navigation */}
-      <div className="hp-dots">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            className={`hp-dot${i === index ? ' hp-dot-active' : ''}`}
-            onClick={() => goTo(i)}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* BOTTOM RIGHT: single thumbnail = next slide */}
+      {/* BOTTOM RIGHT: thumbnail — key=nextIndex forces remount on every slide change */}
       <button
         className="hp-thumb"
         onClick={() => goTo(nextIndex)}
-        aria-label={`View next slide`}
+        aria-label="View next slide"
       >
-        <div className="hp-thumb-img" style={{ backgroundImage: `url(${thumbSlide.image})` }} />
+        <div
+          key={nextIndex}
+          className="hp-thumb-img"
+          style={{ backgroundImage: `url(${thumbSlide.image})` }}
+        />
         <div className="hp-thumb-veil" />
         <div className="hp-thumb-meta">
           <span className="hp-thumb-label">Next</span>
