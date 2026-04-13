@@ -104,24 +104,7 @@ const Hero = () => {
       </div>
 
       {/* BOTTOM RIGHT: thumbnail — key=nextIndex forces remount on every slide change */}
-      <button
-        className="hp-thumb"
-        onClick={() => goTo(nextIndex)}
-        aria-label="View next slide"
-      >
-        <div
-          key={nextIndex}
-          className="hp-thumb-img"
-          style={{ backgroundImage: `url(${thumbSlide.image})` }}
-        />
-        <div className="hp-thumb-veil" />
-        <div className="hp-thumb-meta">
-          <span className="hp-thumb-label">Next</span>
-        </div>
-        <div className="hp-thumb-bar">
-          <div className="hp-thumb-bar-fill" style={{ width: `${progress}%` }} />
-        </div>
-      </button>
+      
 
     </div>
   );

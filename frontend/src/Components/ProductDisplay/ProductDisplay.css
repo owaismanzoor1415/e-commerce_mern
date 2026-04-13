@@ -222,6 +222,9 @@
   .productdisplay { flex-direction: column; padding: 24px; }
   .productdisplay-left { justify-content: center; }
   .productdisplay-img { width: 100%; height: 400px; max-width: 480px; margin: 0 auto; }
-  .productdisplay-img-list { flex-direction: row; }
+  .productdisplay-img-list {
+  flex-direction: column; /* ✅ vertical images */
+  align-items: center;
+}
   .productdisplay-img-list img { width: 60px; height: 72px; }
 }
