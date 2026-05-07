@@ -112,7 +112,7 @@ const Subscribe = () => {
         )}
 
         {/* Fine print */}
-        <p className="sub__fine">No spam, ever. Unsubscribe anytime.</p>
+        <p className="sub__fine">No spam, ever.Unsubscribe anytime.</p>
 
       </div>
     </section>
