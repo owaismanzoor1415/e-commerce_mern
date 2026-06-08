@@ -6,7 +6,6 @@ const slides = [
   { image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1800&auto=format&fit=crop" },
   { image: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=1800&auto=format&fit=crop" },
   { image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=1800&auto=format&fit=crop" },
-  { image: "https://images.unsplash.com/photo-1554412933-514a83d2f3c8?q=80&w=1800&auto=format&fit=crop" },
   { image: "https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?q=80&w=1800&auto=format&fit=crop" },
   { image: "https://images.unsplash.com/photo-1550614000-4895a10e1bfd?q=80&w=1800&auto=format&fit=crop" },
   { image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1800&auto=format&fit=crop" },
